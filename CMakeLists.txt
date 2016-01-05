@@ -7,7 +7,9 @@ find_package(Boost 1.60 REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
 
-if(MSVC)
+if(CMAKE_COMPILER_IS_GNUCXX)
+    add_definitions("-Wall -Weffc++ -Werror -Wextra -Wpedantic")
+elseif(MSVC)
     add_definitions("/W4")
 endif()
 
