@@ -111,7 +111,7 @@ namespace smart_enum
         typename T,
         typename U,
         typename... Args,
-        std::enable_if_t<std::is_convertible<U, T>::value, int> = 0
+        typename std::enable_if<std::is_convertible<U, T>::value, int>::type = 0
     >
     constexpr U get_value_or_default(T, U value, Args...)
     {
@@ -123,7 +123,7 @@ namespace smart_enum
         typename T,
         typename U,
         typename... Args,
-        std::enable_if_t<!std::is_convertible<U, T>::value, int> = 0
+        typename std::enable_if<!std::is_convertible<U, T>::value, int>::type = 0
     >
     constexpr auto get_value_or_default(T default_value, U, Args... args)
         -> decltype(get_value_or_default(default_value, args...))
