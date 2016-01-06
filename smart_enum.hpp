@@ -1,6 +1,9 @@
 #ifndef SMART_ENUM_HEADER_INCLUDED
 #define SMART_ENUM_HEADER_INCLUDED
 
+#include <type_traits>
+
+#include <boost/core/enable_if.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/insert.hpp>
@@ -49,7 +52,7 @@
 
 #define SMART_ENUM_IMPL_DESCRIPTION_2(_, NAME, VALUE) \
     value == NAME::BOOST_PP_TUPLE_ELEM(0, VALUE) ? \
-        smart_enum::enum_description \
+        smart_enum::get_value_or_default \
             BOOST_PP_TUPLE_POP_FRONT( \
                 BOOST_PP_TUPLE_INSERT(VALUE, 1, BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, VALUE))) \
             ) :
@@ -61,9 +64,9 @@
     BOOST_PP_TUPLE_POP_FRONT(BOOST_PP_TUPLE_INSERT(VALUE, 1, DEFAULT_VALUE))
 
 // (a, (b, 1), (c, 2, "x")) =>
-//  a = smart_enum::enum_value(0),
-//  b = smart_enum::enum_value(a + 1, 1),
-//  c = smart_enum::enum_value(b + 1, 2, "x")
+//  a = smart_enum::get_value_or_default(0),
+//  b = smart_enum::get_value_or_default(a + 1, 1),
+//  c = smart_enum::get_value_or_default(b + 1, 2, "x")
 #define SMART_ENUM_IMPL_ENUM_VALUES(VALUES) \
     BOOST_PP_ENUM( \
         BOOST_PP_TUPLE_SIZE(VALUES), \
@@ -73,7 +76,7 @@
 
 #define SMART_ENUM_IMPL_ENUM_VALUES_1(_, INDEX, VALUES) \
     SMART_ENUM_IMPL_VALUE_HEAD(INDEX, VALUES) = \
-        smart_enum::enum_value \
+        smart_enum::get_value_or_default \
             BOOST_PP_IF(INDEX, \
                 SMART_ENUM_IMPL_ENUM_VALUE_ARGS( \
                     BOOST_PP_TUPLE_ELEM(INDEX, VALUES), \
@@ -93,91 +96,38 @@
 
 namespace smart_enum
 {
-    constexpr const char *enum_description(const char *default_description)
-    {
-        return default_description;
-    }
-
-    constexpr const char *enum_description(const char * /* default_description */, const char *description)
-    {
-        return description;
-    }
-
     template
     <
         typename T
     >
-        constexpr const char *enum_description(const char *default_description, T /* value */)
-    {
-        return default_description;
-    }
-
-    template
-    <
-        typename T
-    >
-    constexpr const char *enum_description(const char * /* default_description */, const char *description, T /* value */)
-    {
-        return description;
-    }
-
-    template
-    <
-        typename T
-    >
-    constexpr const char *enum_description(const char * /* default_description */, T /* value */, const char *description)
-    {
-        return description;
-    }
-
-    // enum_value(default_value) => default_value
-    template
-    <
-        typename T
-    >
-    constexpr T enum_value(T default_value)
+    constexpr T get_value_or_default(T default_value)
     {
         return default_value;
     }
 
-    // enum_value(default_value, value) => value
     template
     <
-        typename T, typename U
+        typename T,
+        typename U,
+        typename... Args,
+        typename boost::enable_if<std::is_convertible<U, T>, int>::type = 0
     >
-    constexpr U enum_value(T /* default_value */, U value)
+    constexpr U get_value_or_default(T, U value, Args...)
     {
         return value;
     }
 
-    // enum_value(default_value, description) => default_value
     template
     <
-        typename T
+        typename T,
+        typename U,
+        typename... Args,
+        typename boost::disable_if<std::is_convertible<U, T>, int>::type = 0
     >
-    constexpr T enum_value(T default_value, const char * /* description */)
+    constexpr auto get_value_or_default(T default_value, U, Args... args)
+        -> decltype(get_value_or_default(default_value, args...))
     {
-        return default_value;
-    }
-
-    // enum_value(default_value, value, description) => value
-    template
-    <
-        typename T, typename U
-    >
-    constexpr U enum_value(T /* default_value */, U value, const char * /* description */)
-    {
-        return value;
-    }
-
-    // enum_value(default_value, description, value) => value
-    template
-    <
-        typename T, typename U
-    >
-    constexpr U enum_value(T /* default_value */, const char * /* description */, U value)
-    {
-        return value;
+        return get_value_or_default(default_value, args...);
     }
 }
 
