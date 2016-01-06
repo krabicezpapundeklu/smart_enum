@@ -3,7 +3,6 @@
 
 #include <type_traits>
 
-#include <boost/core/enable_if.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/insert.hpp>
@@ -112,7 +111,7 @@ namespace smart_enum
         typename T,
         typename U,
         typename... Args,
-        typename boost::enable_if<std::is_convertible<U, T>, int>::type = 0
+        std::enable_if_t<std::is_convertible<U, T>::value, int> = 0
     >
     constexpr U get_value_or_default(T, U value, Args...)
     {
@@ -124,7 +123,7 @@ namespace smart_enum
         typename T,
         typename U,
         typename... Args,
-        typename boost::disable_if<std::is_convertible<U, T>, int>::type = 0
+        std::enable_if_t<!std::is_convertible<U, T>::value, int> = 0
     >
     constexpr auto get_value_or_default(T default_value, U, Args... args)
         -> decltype(get_value_or_default(default_value, args...))
