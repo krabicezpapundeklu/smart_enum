@@ -96,6 +96,8 @@
 
 namespace smart_enum
 {
+    // get_value_or_default(default_value [, value [, value...]])
+    //  => return 1st "value" compatible with "default_value" or "default_value" if no such value exists
     template
     <
         typename T
