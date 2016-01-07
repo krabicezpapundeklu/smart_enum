@@ -84,6 +84,7 @@
         template<> struct enum_traits<NAME> \
         { \
             static constexpr std::size_t count = BOOST_PP_TUPLE_SIZE(VALUES); \
+            static constexpr const char *name = BOOST_PP_STRINGIZE(NAME); \
             \
             static constexpr const char *description(NAME value) \
             { \
@@ -91,8 +92,21 @@
                     SMART_ENUM_IMPL_DESCRIPTION, NAME, BOOST_PP_TUPLE_TO_SEQ(VALUES) \
                 ) ""; \
             } \
+            \
+            static constexpr NAME value(std::size_t index) \
+            { \
+                /* assert(index <= count); */ \
+                \
+                return BOOST_PP_REPEAT( \
+                    BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_VALUE, (NAME)(VALUES) \
+                ) value(count - 1); \
+            } \
         }; \
     }
+
+#define SMART_ENUM_IMPL_VALUE(_, INDEX, NAME_VALUES) \
+    index == INDEX ? BOOST_PP_SEQ_ELEM(0, NAME_VALUES) :: \
+        SMART_ENUM_IMPL_VALUE_HEAD(INDEX, BOOST_PP_SEQ_ELEM(1, NAME_VALUES)) :
 
 // 0, ((a, 0), (b, 1)) => a
 // 1, ((a, 0), (b, 1)) => b
