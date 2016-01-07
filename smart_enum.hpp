@@ -99,7 +99,7 @@
                 \
                 return BOOST_PP_REPEAT( \
                     BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_VALUE, (NAME)(VALUES) \
-                ) value(count - 1); \
+                ) value(0); \
             } \
         }; \
     }
