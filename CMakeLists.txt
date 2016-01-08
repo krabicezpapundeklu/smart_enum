@@ -21,4 +21,4 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_definitions("/W4 /WX")
 endif()
 
-add_executable(smart_enum main.cpp smart_enum.hpp)
+add_executable(smart_enum examples.cpp smart_enum.hpp)
