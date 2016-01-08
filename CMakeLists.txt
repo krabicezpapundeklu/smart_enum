@@ -9,7 +9,7 @@ if(Boost_FOUND)
     message("Using system Boost (${Boost_INCLUDE_DIRS})")
     include_directories(${Boost_INCLUDE_DIRS})
 else()
-    message("Using embedded Boost")
+    message("Using included Boost")
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
