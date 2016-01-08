@@ -38,7 +38,7 @@ SMART_ENUM
 )
 
 /*
-    enum class e_c
+    enum class e_c_1
     {
         a,
         b,
@@ -47,27 +47,26 @@ SMART_ENUM
 */
 SMART_ENUM_CLASS
 (
-    e_c,
+    e_c_1,
     (
         a, b, c
     )
 )
 
-template
-<
-    typename T
->
-using is_scoped_enum = std::integral_constant
-<
-    bool, std::is_enum<T>::value && !std::is_convertible<T, int>::value
->;
+enum e_3
+{
+};
+
+enum class e_c_2
+{
+};
 
 int main()
 {
     // e_1
     using e_1_traits = smart_enum::enum_traits<e_1>;
 
-    static_assert(!is_scoped_enum<e_1>::value, "e_1 == enum class");
+    static_assert(!e_1_traits::is_enum_class, "e_1 == enum class");
 
     static_assert(e_1::e_1_a ==  0, "e_1_a !=  0");
     static_assert(e_1::e_1_b == 10, "e_1_b != 10");
@@ -94,8 +93,14 @@ int main()
     // e_2
     static_assert(sizeof(e_2) == sizeof(short), "sizeof(e_2) != sizeof(short)");
 
-    // e_c
-    static_assert(is_scoped_enum<e_c>::value, "e_c != enum class");
+    // e_c_1
+    static_assert(smart_enum::enum_traits<e_c_1>::is_enum_class, "e_c_1 != enum class");
+
+    // e_3
+    static_assert(!smart_enum::enum_traits<e_3>::is_enum_class, "e_3 == enum class");
+
+    // e_c_2
+    static_assert(smart_enum::enum_traits<e_c_2>::is_enum_class, "e_c_2 != enum class");
 
     return 0;
 }

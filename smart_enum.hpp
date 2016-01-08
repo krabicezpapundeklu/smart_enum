@@ -81,7 +81,7 @@
 #define SMART_ENUM_IMPL_TRAITS_1(NAME, VALUES) \
     namespace smart_enum \
     { \
-        template<> struct enum_traits<NAME> \
+        template<> struct enum_traits<NAME> : detail::enum_traits_base<NAME> \
         { \
             static constexpr std::size_t count = BOOST_PP_TUPLE_SIZE(VALUES); \
             static constexpr const char *name = BOOST_PP_STRINGIZE(NAME); \
@@ -115,16 +115,21 @@
 
 namespace smart_enum
 {
-    template
-    <
-        typename T
-    >
-    struct enum_traits
-    {
-    };
-
     namespace detail
     {
+        template
+        <
+            typename T
+        >
+        struct enum_traits_base
+        {
+            static constexpr bool is_enum_class =
+                std::integral_constant
+                <
+                    bool, std::is_enum<T>::value && !std::is_convertible<T, int>::value
+                >::value;
+        };
+
         // get_value_or_default(default_value [, value [, value...]])
         //  => return 1st "value" compatible with "default_value" or "default_value" if no such value exists
         template
@@ -161,6 +166,14 @@ namespace smart_enum
             return get_value_or_default(default_value, args...);
         }
     }
+
+    template
+    <
+        typename T
+    >
+    struct enum_traits : detail::enum_traits_base<T>
+    {
+    };
 }
 
 #endif
