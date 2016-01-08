@@ -1,28 +1,55 @@
 #include <cassert>
 #include <cstring>
-#include <iostream>
 
 #include "smart_enum.hpp"
 
+/*
+    enum e_1
+    {
+        e_1_a,
+        e_1_b = 10,
+        e_1_c,
+        e_1_d = e_1_a + 1,
+        e_1_e = 30
+    };
+*/
 SMART_ENUM
 (
     e_1,
     (
-        a,
-        (b, 10),
-        (c, "ccc"),
-        (d, 1, "ddd"),
-        (e, "eee", 5)
+        e_1_a, (e_1_b, 10), (e_1_c, "e_1::c"), (e_1_d, e_1_a + 1, "e_1::d"), (e_1_e, "e_1::e", 30)
     )
 )
 
-SMART_ENUM_CLASS
+/*
+    enum e_2 : short
+    {
+        e_2_a,
+        e_2_b,
+        e_2_c
+    };
+*/
+SMART_ENUM
 (
     (e_2, short),
     (
+        e_2_a, e_2_b, e_2_c
+    )
+)
+
+/*
+    enum class e_c
+    {
         a,
         b,
         c
+    };
+*/
+SMART_ENUM_CLASS
+(
+    e_c,
+    (
+        a, b, c
     )
 )
 
@@ -30,52 +57,45 @@ template
 <
     typename T
 >
-void print(std::ostream &stream)
-{
-    using enum_traits = smart_enum::enum_traits<T>;
-
-    stream << enum_traits::name << " = {";
-
-    for(auto i = 0u; i < enum_traits::count; ++i)
-    {
-        if(i > 0)
-        {
-            stream << ", ";
-        }
-
-        auto v = enum_traits::value(i);
-        auto d = enum_traits::description(v);
-
-        stream << static_cast<typename std::underlying_type<T>::type>(v) << ": \"" << d << '"';
-    }
-
-    stream << '}' << std::endl;
-}
+using is_scoped_enum = std::integral_constant
+<
+    bool, std::is_enum<T>::value && !std::is_convertible<T, int>::value
+>;
 
 int main()
 {
-    using e1_enum_traits = smart_enum::enum_traits<e_1>;
-    using e2_enum_traits = smart_enum::enum_traits<e_2>;
+    // e_1
+    using e_1_traits = smart_enum::enum_traits<e_1>;
 
-    static_assert(e_1::a ==  0, "");
-    static_assert(e_1::b == 10, "");
-    static_assert(e_1::c == 11, "");
-    static_assert(e_1::d ==  1, "");
-    static_assert(e_1::e ==  5, "");
+    static_assert(!is_scoped_enum<e_1>::value, "e_1 == enum class");
 
-    static_assert(e1_enum_traits::count == 5, "");
-    static_assert(e2_enum_traits::count == 3, "");
+    static_assert(e_1::e_1_a ==  0, "e_1_a !=  0");
+    static_assert(e_1::e_1_b == 10, "e_1_b != 10");
+    static_assert(e_1::e_1_c == 11, "e_1_c != 11");
+    static_assert(e_1::e_1_d ==  1, "e_1_d !=  1");
+    static_assert(e_1::e_1_e == 30, "e_1_e != 30");
 
-    assert(!strcmp(e1_enum_traits::description(e_1::a), "a"));
-    assert(!strcmp(e1_enum_traits::description(e_1::b), "b"));
-    assert(!strcmp(e1_enum_traits::description(e_1::c), "ccc"));
-    assert(!strcmp(e1_enum_traits::description(e_1::d), "ddd"));
-    assert(!strcmp(e1_enum_traits::description(e_1::e), "eee"));
+    static_assert(e_1_traits::count == 5, "e_1 count != 5");
 
-    static_assert(sizeof(e_2) == sizeof(short), "");
+    assert(!strcmp(e_1_traits::description(e_1::e_1_a), "e_1_a"));
+    assert(!strcmp(e_1_traits::description(e_1::e_1_b), "e_1_b"));
+    assert(!strcmp(e_1_traits::description(e_1::e_1_c), "e_1::c"));
+    assert(!strcmp(e_1_traits::description(e_1::e_1_d), "e_1::d"));
+    assert(!strcmp(e_1_traits::description(e_1::e_1_e), "e_1::e"));
 
-    print<e_1>(std::cout);
-    print<e_2>(std::cout);
+    assert(!strcmp(e_1_traits::name, "e_1"));
+
+    static_assert(e_1_traits::value(0) == e_1::e_1_a, "e_1 value[0] != e_1_a");
+    static_assert(e_1_traits::value(1) == e_1::e_1_b, "e_1 value[1] != e_1_b");
+    static_assert(e_1_traits::value(2) == e_1::e_1_c, "e_1 value[2] != e_1_c");
+    static_assert(e_1_traits::value(3) == e_1::e_1_d, "e_1 value[3] != e_1_d");
+    static_assert(e_1_traits::value(4) == e_1::e_1_e, "e_1 value[4] != e_1_e");
+
+    // e_2
+    static_assert(sizeof(e_2) == sizeof(short), "sizeof(e_2) != sizeof(short)");
+
+    // e_c
+    static_assert(is_scoped_enum<e_c>::value, "e_c != enum class");
 
     return 0;
 }
