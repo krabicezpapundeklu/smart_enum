@@ -52,9 +52,9 @@
             BOOST_PP_TUPLE_REPLACE(VALUE, 0, BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, VALUE))) :
 
 // (a, (b, 1), (c, 2, "x")) =>
-//  a = smart_enum::get_value_or_default(0),
-//  b = smart_enum::get_value_or_default(a + 1, 1),
-//  c = smart_enum::get_value_or_default(b + 1, 2, "x")
+//  a = smart_enum::detail::get_value_or_default(0),
+//  b = smart_enum::detail::get_value_or_default(a + 1, 1),
+//  c = smart_enum::detail::get_value_or_default(b + 1, 2, "x")
 #define SMART_ENUM_IMPL_ENUM_VALUES(VALUES) \
     BOOST_PP_ENUM( \
         BOOST_PP_TUPLE_SIZE(VALUES), \
