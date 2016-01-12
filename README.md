@@ -2,7 +2,7 @@
 Tiny library for C++ `enum` introspection.
 
 ##Motivating example
-```
+```c++
 SMART_ENUM
 (
   e_1,
@@ -15,7 +15,7 @@ SMART_ENUM
 
 Generates:
 
-```
+```c++
 enum e_1
 {
   e_1_a,
@@ -28,7 +28,7 @@ enum e_1
 
 And template `smart_enum::enum_traits<e_1>` having following fields and methods:
 
-```
+```c++
 smart_enum::enum_traits<e_1>::count = 5
 smart_enum::enum_traits<e_1>::description(e_1::e_1_a) = "e_1_a"
 ...
