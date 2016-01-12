@@ -75,6 +75,10 @@
             ? BOOST_PP_SEQ_ELEM(0, NAME_VALUES) :: \
                 SMART_ENUM_IMPL_VALUE_HEAD(INDEX, BOOST_PP_SEQ_ELEM(1, NAME_VALUES)) :
 
+#define SMART_ENUM_IMPL_INDEX_OF(_, INDEX, NAME_VALUES) \
+    value == BOOST_PP_SEQ_ELEM(0, NAME_VALUES) :: \
+        SMART_ENUM_IMPL_VALUE_HEAD(INDEX, BOOST_PP_SEQ_ELEM(1, NAME_VALUES)) ? INDEX :
+
 // (name, size) => name : size
 #define SMART_ENUM_IMPL_NAME_SIZE(NAME_SIZE) \
     BOOST_PP_TUPLE_ELEM(0, NAME_SIZE) : BOOST_PP_TUPLE_ELEM(1, NAME_SIZE)
@@ -103,6 +107,13 @@
                 return BOOST_PP_REPEAT( \
                     BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_FROM_STRING, (NAME)(VALUES) \
                 ) value(0); \
+            } \
+            \
+            static constexpr std::size_t index_of(NAME value) \
+            { \
+                return BOOST_PP_REPEAT( \
+                    BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_INDEX_OF, (NAME)(VALUES) \
+                ) 0; \
             } \
             \
             static constexpr const char *to_string(NAME value) \

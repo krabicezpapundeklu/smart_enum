@@ -88,6 +88,12 @@ int main()
     static_assert(e_1_traits::from_string("e_1_d") == e_1::e_1_d, "!e_1_d");
     static_assert(e_1_traits::from_string("e_1_e") == e_1::e_1_e, "!e_1_e");
 
+    static_assert(e_1_traits::index_of(e_1::e_1_a) == 0, "!0");
+    static_assert(e_1_traits::index_of(e_1::e_1_b) == 1, "!1");
+    static_assert(e_1_traits::index_of(e_1::e_1_c) == 2, "!2");
+    static_assert(e_1_traits::index_of(e_1::e_1_d) == 3, "!3");
+    static_assert(e_1_traits::index_of(e_1::e_1_e) == 4, "!4");
+
     assert(!strcmp(e_1_traits::to_string(e_1::e_1_a), "e_1_a"));
     assert(!strcmp(e_1_traits::to_string(e_1::e_1_b), "e_1_b"));
     assert(!strcmp(e_1_traits::to_string(e_1::e_1_c), "e_1_c"));
