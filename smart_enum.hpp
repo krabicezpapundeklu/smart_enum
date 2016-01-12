@@ -104,10 +104,9 @@
             \
             static constexpr NAME from_string(const char *s) \
             { \
-                /* TODO: assert */ \
                 return BOOST_PP_REPEAT( \
                     BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_FROM_STRING, (NAME)(VALUES) \
-                ) value(0); \
+                ) throw std::invalid_argument("s"); \
             } \
             \
             static constexpr std::size_t index_of(NAME value) \
@@ -126,11 +125,9 @@
             \
             static constexpr NAME value(std::size_t index) \
             { \
-                /* TODO: assert(index <= count); */ \
-                \
                 return BOOST_PP_REPEAT( \
                     BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_VALUE, (NAME)(VALUES) \
-                ) value(0); \
+                ) throw std::invalid_argument("index"); \
             } \
         }; \
     }
