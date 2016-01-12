@@ -70,6 +70,7 @@ enum class e_c_2
 int main()
 {
     // e_1
+    using e_1_iterator = smart_enum::enum_iterator<e_1>;
     using e_1_traits = smart_enum::enum_traits<e_1>;
 
     static_assert(!e_1_traits::is_enum_class, "e_1 == enum class");
@@ -107,6 +108,8 @@ int main()
     static_assert(e_1_traits::value(2) == e_1::e_1_c, "e_1 value[2] != e_1_c");
     static_assert(e_1_traits::value(3) == e_1::e_1_d, "e_1 value[3] != e_1_d");
     static_assert(e_1_traits::value(4) == e_1::e_1_e, "e_1 value[4] != e_1_e");
+
+    assert(e_1_iterator{} - e_1_iterator{e_1::e_1_a} == e_1_traits::count);
 
     // e_2
     static_assert(sizeof(e_2) == sizeof(short), "sizeof(e_2) != sizeof(short)");

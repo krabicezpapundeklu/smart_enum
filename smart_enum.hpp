@@ -9,6 +9,7 @@
 
 #include <type_traits>
 
+#include <boost/iterator/iterator_facade.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/pop_front.hpp>
@@ -195,6 +196,67 @@ namespace smart_enum
     >
     struct enum_traits : detail::enum_traits_base<T>
     {
+    };
+
+    template
+    <
+        typename T
+    >
+    class enum_iterator : public boost::iterator_facade
+        <
+            enum_iterator<T>,
+            T,
+            boost::random_access_traversal_tag,
+            T
+        >
+    {
+    public:
+        constexpr enum_iterator()
+            : index_{enum_traits<T>::count}
+        {
+
+        }
+
+        constexpr explicit enum_iterator(T value)
+            : index_{enum_traits<T>::index_of(value)}
+        {
+        }
+
+    private:
+        std::size_t index_;
+
+        void advance(std::ptrdiff_t n)
+        {
+            index_ += n;
+        }
+
+        void decrement()
+        {
+            --index_;
+        }
+
+        constexpr T dereference() const
+        {
+            return enum_traits<T>::value(index_);
+        }
+
+        constexpr std::ptrdiff_t distance_to(const enum_iterator &other) const
+        {
+            // TODO
+            return static_cast<std::ptrdiff_t>(other.index_ - index_);
+        }
+
+        constexpr bool equal(const enum_iterator &other) const
+        {
+            return other.index_ == index_;
+        }
+
+        void increment()
+        {
+            ++index_;
+        }
+
+        friend class boost::iterator_core_access;
     };
 }
 
