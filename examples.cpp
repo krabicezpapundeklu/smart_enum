@@ -23,7 +23,7 @@ SMART_ENUM
 (
     e_1,
     (
-        e_1_a, (e_1_b, 10), (e_1_c, "e_1::c"), (e_1_d, e_1_a + 1, "e_1::d"), (e_1_e, "e_1::e", 30)
+        e_1_a, (e_1_b, 10), e_1_c, (e_1_d, e_1_a + 1), (e_1_e, 30)
     )
 )
 
@@ -82,11 +82,17 @@ int main()
 
     static_assert(e_1_traits::count == 5, "e_1 count != 5");
 
-    assert(!strcmp(e_1_traits::description(e_1::e_1_a), "e_1_a"));
-    assert(!strcmp(e_1_traits::description(e_1::e_1_b), "e_1_b"));
-    assert(!strcmp(e_1_traits::description(e_1::e_1_c), "e_1::c"));
-    assert(!strcmp(e_1_traits::description(e_1::e_1_d), "e_1::d"));
-    assert(!strcmp(e_1_traits::description(e_1::e_1_e), "e_1::e"));
+    static_assert(e_1_traits::from_string("e_1_a") == e_1::e_1_a, "!e_1_a");
+    static_assert(e_1_traits::from_string("e_1_b") == e_1::e_1_b, "!e_1_b");
+    static_assert(e_1_traits::from_string("e_1_c") == e_1::e_1_c, "!e_1_c");
+    static_assert(e_1_traits::from_string("e_1_d") == e_1::e_1_d, "!e_1_d");
+    static_assert(e_1_traits::from_string("e_1_e") == e_1::e_1_e, "!e_1_e");
+
+    assert(!strcmp(e_1_traits::to_string(e_1::e_1_a), "e_1_a"));
+    assert(!strcmp(e_1_traits::to_string(e_1::e_1_b), "e_1_b"));
+    assert(!strcmp(e_1_traits::to_string(e_1::e_1_c), "e_1_c"));
+    assert(!strcmp(e_1_traits::to_string(e_1::e_1_d), "e_1_d"));
+    assert(!strcmp(e_1_traits::to_string(e_1::e_1_e), "e_1_e"));
 
     assert(!strcmp(e_1_traits::name, "e_1"));
 

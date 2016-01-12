@@ -46,15 +46,10 @@
 #define SMART_ENUM_IMPL_ARGS_TO_TUPLES_1(_, INDEX, ARGS) \
     SMART_ENUM_IMPL_ARG_TO_TUPLE(BOOST_PP_TUPLE_ELEM(INDEX, ARGS))
 
-#define SMART_ENUM_IMPL_DESCRIPTION(_, NAME, VALUE) \
-    value == NAME::BOOST_PP_TUPLE_ELEM(0, VALUE) ? \
-        smart_enum::detail::get_value_or_default \
-            BOOST_PP_TUPLE_REPLACE(VALUE, 0, BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, VALUE))) :
-
-// (a, (b, 1), (c, 2, "x")) =>
+// (a, (b, 1), (c, 2)) =>
 //  a = smart_enum::detail::get_value_or_default(0),
 //  b = smart_enum::detail::get_value_or_default(a + 1, 1),
-//  c = smart_enum::detail::get_value_or_default(b + 1, 2, "x")
+//  c = smart_enum::detail::get_value_or_default(b + 1, 2)
 #define SMART_ENUM_IMPL_ENUM_VALUES(VALUES) \
     BOOST_PP_ENUM( \
         BOOST_PP_TUPLE_SIZE(VALUES), \
@@ -74,9 +69,19 @@
                 BOOST_PP_TUPLE_REPLACE(BOOST_PP_TUPLE_ELEM(INDEX, VALUES), 0, 0) \
             )
 
+#define SMART_ENUM_IMPL_FROM_STRING(_, INDEX, NAME_VALUES) \
+    smart_enum::detail::equal( \
+        s, BOOST_PP_STRINGIZE(SMART_ENUM_IMPL_VALUE_HEAD(INDEX, BOOST_PP_SEQ_ELEM(1, NAME_VALUES)))) \
+            ? BOOST_PP_SEQ_ELEM(0, NAME_VALUES) :: \
+                SMART_ENUM_IMPL_VALUE_HEAD(INDEX, BOOST_PP_SEQ_ELEM(1, NAME_VALUES)) :
+
 // (name, size) => name : size
 #define SMART_ENUM_IMPL_NAME_SIZE(NAME_SIZE) \
     BOOST_PP_TUPLE_ELEM(0, NAME_SIZE) : BOOST_PP_TUPLE_ELEM(1, NAME_SIZE)
+
+#define SMART_ENUM_IMPL_TO_STRING(_, NAME, VALUE) \
+    value == NAME::BOOST_PP_TUPLE_ELEM(0, VALUE) \
+        ? BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, VALUE)) :
 
 #define SMART_ENUM_IMPL_TRAITS(NAME, VALUES) \
     SMART_ENUM_IMPL_TRAITS_1( \
@@ -92,16 +97,24 @@
             static constexpr std::size_t count = BOOST_PP_TUPLE_SIZE(VALUES); \
             static constexpr const char *name = BOOST_PP_STRINGIZE(NAME); \
             \
-            static constexpr const char *description(NAME value) \
+            static constexpr NAME from_string(const char *s) \
+            { \
+                /* TODO: assert */ \
+                return BOOST_PP_REPEAT( \
+                    BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_FROM_STRING, (NAME)(VALUES) \
+                ) value(0); \
+            } \
+            \
+            static constexpr const char *to_string(NAME value) \
             { \
                 return BOOST_PP_SEQ_FOR_EACH( \
-                    SMART_ENUM_IMPL_DESCRIPTION, NAME, BOOST_PP_TUPLE_TO_SEQ(VALUES) \
+                    SMART_ENUM_IMPL_TO_STRING, NAME, BOOST_PP_TUPLE_TO_SEQ(VALUES) \
                 ) ""; \
             } \
             \
             static constexpr NAME value(std::size_t index) \
             { \
-                /* assert(index <= count); */ \
+                /* TODO: assert(index <= count); */ \
                 \
                 return BOOST_PP_REPEAT( \
                     BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_VALUE, (NAME)(VALUES) \
@@ -136,8 +149,6 @@ namespace smart_enum
                 >::value;
         };
 
-        // get_value_or_default(default_value [, value [, value...]])
-        //  => return 1st "value" compatible with "default_value" or "default_value" if no such value exists
         template
         <
             typename T
@@ -149,27 +160,21 @@ namespace smart_enum
 
         template
         <
-            typename T,
-            typename U,
-            typename... Args,
-            typename std::enable_if<std::is_convertible<U, T>::value, int>::type = 0
+            typename T, typename U
         >
-        constexpr U get_value_or_default(T, U value, Args...)
+        constexpr U get_value_or_default(T /* default_value */, U value)
         {
             return value;
         }
 
-        template
-        <
-            typename T,
-            typename U,
-            typename... Args,
-            typename std::enable_if<!std::is_convertible<U, T>::value, int>::type = 0
-        >
-        constexpr auto get_value_or_default(T default_value, U, Args... args)
-            -> decltype(get_value_or_default(default_value, args...))
+        constexpr bool equal_helper(const char *x, const char *y)
         {
-            return get_value_or_default(default_value, args...);
+            return *x == *y && (*x == '\0' || equal_helper(x + 1, y + 1));
+        }
+
+        constexpr bool equal(const char *x, const char *y)
+        {
+            return (x == nullptr && y == nullptr) || (x && y && equal_helper(x, y));
         }
     }
 
