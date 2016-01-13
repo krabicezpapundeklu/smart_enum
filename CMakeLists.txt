@@ -14,7 +14,7 @@ else()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_definitions("-Werror -Weverything -Wno-c++98-compat-pedantic -Wno-disabled-macro-expansion -Wno-gnu-zero-variadic-macro-arguments")
+    add_definitions("-Werror -Weverything -Wno-c++98-compat-pedantic -Wno-disabled-macro-expansion -Wno-gnu-zero-variadic-macro-arguments -Wno-missing-prototypes")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_definitions("-Wall -Weffc++ -Werror -Wextra -Wpedantic")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")

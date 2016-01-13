@@ -241,7 +241,14 @@ namespace smart_enum
 
         void advance(std::ptrdiff_t n)
         {
-            index_ += n;
+            if(n > 0)
+            {
+                index_ += static_cast<std::size_t>(n);
+            }
+            else
+            {
+                index_ -= static_cast<std::size_t>(-n);
+            }
         }
 
         void decrement()
@@ -256,7 +263,7 @@ namespace smart_enum
 
         constexpr std::ptrdiff_t distance_to(const enum_iterator &other) const
         {
-            return other.index_ - index_;
+            return static_cast<std::ptrdiff_t>(other.index_ - index_);
         }
 
         constexpr bool equal(const enum_iterator &other) const

@@ -80,7 +80,10 @@ void examples_iterators()
     assert(i[0] == e_1_a);
     assert(i[1] == e_1_b);
 
-    assert(e - i == static_cast<std::ptrdiff_t>(count<e_1>()));
+    assert(e - i ==  static_cast<std::ptrdiff_t>(count<e_1>()));
+    assert(i - e == -static_cast<std::ptrdiff_t>(count<e_1>()));
+
+    assert(*(e - 3) == e_1_a);
 
     for(; i != e; ++i)
     {
