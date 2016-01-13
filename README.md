@@ -31,9 +31,9 @@ And makes following `constexpr` functions available:
 ```c++
 count<e_1>() = 5 // number of values in enum
 
-from_string<e_1>("e_1_a") = e_1::e_1_a; // converts value name to value
+from_string<e_1>("e_1_a") = e_1::e_1_a // converts value name to value
 ...
-from_string<e_1>("e_1_e") = e_1::e_1_e;
+from_string<e_1>("e_1_e") = e_1::e_1_e
 
 index_of(e_1::e_1_a) = 0 // index of value in enum
 ...
