@@ -234,13 +234,12 @@ namespace smart_enum
 
         constexpr T dereference() const
         {
-            return enum_traits<T>::value(index_);
+            return enum_traits<T>::value_of(index_);
         }
 
         constexpr std::ptrdiff_t distance_to(const enum_iterator &other) const
         {
-            // TODO
-            return static_cast<std::ptrdiff_t>(other.index_ - index_);
+            return other.index_ - index_;
         }
 
         constexpr bool equal(const enum_iterator &other) const
@@ -296,6 +295,15 @@ namespace smart_enum
     <
         typename T
     >
+    constexpr const char *name()
+    {
+        return enum_traits<T>::name;
+    }
+
+    template
+    <
+        typename T
+    >
     constexpr const char *to_string(T value)
     {
         return enum_traits<T>::to_string(value);
@@ -308,14 +316,6 @@ namespace smart_enum
     constexpr T value_of(std::size_t index)
     {
         return enum_traits<T>::value_of(index);
-    }
-    template
-    <
-        typename T
-    >
-    constexpr const char *name()
-    {
-        return enum_traits<T>::name;
     }
 }
 

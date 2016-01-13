@@ -5,6 +5,7 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cassert>
+#include <iostream>
 
 #include "smart_enum.hpp"
 
@@ -70,6 +71,24 @@ void examples_is_enum_class()
     static_assert(is_enum_class<e_c_1>(), "e_c_1 != enum class");
 }
 
+void examples_iterators()
+{
+    using e_1_iterator = enum_iterator<e_1>;
+
+    auto i = e_1_iterator{e_1::e_1_a};
+    auto e = e_1_iterator{};
+
+    assert(i[0] == e_1_a);
+    assert(i[1] == e_1_b);
+
+    assert(e - i == static_cast<std::ptrdiff_t>(count<e_1>()));
+
+    for(; i != e; ++i)
+    {
+        std::cout << to_string(*i) << " = " << *i << std::endl;
+    }
+}
+
 void examples_name()
 {
     // WARNING: 'detail::equal' is implementation detail!
@@ -105,6 +124,7 @@ int main()
     examples_from_string();
     examples_index_of();
     examples_is_enum_class();
+    examples_iterators();
     examples_name();
     examples_to_string();
 
