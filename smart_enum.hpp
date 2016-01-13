@@ -99,8 +99,20 @@
     { \
         template<> struct enum_traits<NAME> : detail::enum_traits_base<NAME> \
         { \
+            using type = NAME; \
+            \
             static constexpr std::size_t count = BOOST_PP_TUPLE_SIZE(VALUES); \
             static constexpr const char *name = BOOST_PP_STRINGIZE(NAME); \
+            \
+            static constexpr enum_iterator<NAME> begin() \
+            { \
+                return enum_iterator<NAME>{value_of(0)}; \
+            } \
+            \
+            static constexpr enum_iterator<NAME> end() \
+            { \
+                return enum_iterator<NAME>{}; \
+            } \
             \
             static constexpr NAME from_string(const char *s) \
             { \
@@ -259,9 +271,27 @@ namespace smart_enum
     <
         typename T
     >
+    constexpr enum_iterator<T> begin()
+    {
+        return enum_traits<T>::begin();
+    }
+
+    template
+    <
+        typename T
+    >
     constexpr std::size_t count()
     {
         return enum_traits<T>::count;
+    }
+
+    template
+    <
+        typename T
+    >
+    constexpr enum_iterator<T> end()
+    {
+        return enum_traits<T>::end();
     }
 
     template

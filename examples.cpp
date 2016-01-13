@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 
@@ -73,10 +74,8 @@ void examples_is_enum_class()
 
 void examples_iterators()
 {
-    using e_1_iterator = enum_iterator<e_1>;
-
-    auto i = e_1_iterator{e_1::e_1_a};
-    auto e = e_1_iterator{};
+    auto i = begin<e_1>();
+    auto e = end<e_1>();
 
     assert(i[0] == e_1_a);
     assert(i[1] == e_1_b);
@@ -87,6 +86,11 @@ void examples_iterators()
     {
         std::cout << to_string(*i) << " = " << *i << std::endl;
     }
+
+    std::for_each(begin<e_1>(), end<e_1>(), [](e_1 x)
+    {
+        std::cout << to_string(x) << " = " << x << std::endl;
+    });
 }
 
 void examples_name()
