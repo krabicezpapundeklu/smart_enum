@@ -13,7 +13,7 @@ SMART_ENUM
 
 ```
 
-Generates:
+Defines:
 
 ```c++
 enum e_1
@@ -52,7 +52,16 @@ value_of<e_1>(0) = e_1::e_1_a // value at specified 'index'
 value_of<e_1>(4) = e_1::e_1_e
 ```
 
-##Usage
+##Documentation
+###Macros `SMART_ENUM` and `SMART_ENUM_CLASS`
+Macros for defining "smart" enums. The only difference is that `SMART_ENUM` generates `enum` while `SMART_ENUM_CLASS` generates `enum class`.
+
+###Usage
+`SMART_ENUM(name_with_optional_size, (value_name_with_optional_value, value_name_with_optional_value, ...))`
+- `name_with_optional_size` - either enum name or tuple `(name, size)`. Example: `SMART_ENUM(e, ...)` defines `enum e {...};`, `SMART_ENUM((e, short), ...)` defines `enum e : short {...}`.
+- `value_name_with_optional_value` - either value name or tuple `(value_name, value)`. Example: `SMART_ENUM(e, (a, b))` defines `enum e {a, b};`, `SMART_ENUM(e, (a, (b, 10), c))` defines `enum e {a, b = 10, c};`.
+
+##Library usage
 If you are using [Boost](http://www.boost.org/) >= 1.60 then just add `smart_enum.hpp` to your project and you're done.
 If not then also add included `boost` directory which contains subset of [Boost](http://www.boost.org/).
 
