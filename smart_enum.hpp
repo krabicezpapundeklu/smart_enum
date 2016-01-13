@@ -123,7 +123,7 @@
                 ) ""; \
             } \
             \
-            static constexpr NAME value(std::size_t index) \
+            static constexpr NAME value_of(std::size_t index) \
             { \
                 return BOOST_PP_REPEAT( \
                     BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_VALUE, (NAME)(VALUES) \
@@ -255,6 +255,68 @@ namespace smart_enum
 
         friend class boost::iterator_core_access;
     };
+
+    template
+    <
+        typename T
+    >
+    constexpr std::size_t count()
+    {
+        return enum_traits<T>::count;
+    }
+
+    template
+    <
+        typename T
+    >
+    constexpr T from_string(const char *s)
+    {
+        return enum_traits<T>::from_string(s);
+    }
+
+    template
+    <
+        typename T
+    >
+    constexpr std::size_t index_of(T value)
+    {
+        return enum_traits<T>::index_of(value);
+    }
+
+    template
+    <
+        typename T
+    >
+    constexpr bool is_enum_class()
+    {
+        return enum_traits<T>::is_enum_class;
+    }
+
+    template
+    <
+        typename T
+    >
+    constexpr const char *to_string(T value)
+    {
+        return enum_traits<T>::to_string(value);
+    }
+
+    template
+    <
+        typename T
+    >
+    constexpr T value_of(std::size_t index)
+    {
+        return enum_traits<T>::value_of(index);
+    }
+    template
+    <
+        typename T
+    >
+    constexpr const char *name()
+    {
+        return enum_traits<T>::name;
+    }
 }
 
 #endif

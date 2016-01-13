@@ -69,11 +69,10 @@ enum class e_c_2
 
 int main()
 {
-    // e_1
-    using e_1_iterator = smart_enum::enum_iterator<e_1>;
-    using e_1_traits = smart_enum::enum_traits<e_1>;
+    using namespace smart_enum;
 
-    static_assert(!e_1_traits::is_enum_class, "e_1 == enum class");
+    // e_1
+    static_assert(!is_enum_class<e_1>(), "e_1 == enum class");
 
     static_assert(e_1::e_1_a ==  0, "e_1_a !=  0");
     static_assert(e_1::e_1_b == 10, "e_1_b != 10");
@@ -81,47 +80,49 @@ int main()
     static_assert(e_1::e_1_d ==  1, "e_1_d !=  1");
     static_assert(e_1::e_1_e == 30, "e_1_e != 30");
 
-    static_assert(e_1_traits::count == 5, "e_1 count != 5");
+    static_assert(count<e_1>() == 5, "e_1 count != 5");
 
-    static_assert(e_1_traits::from_string("e_1_a") == e_1::e_1_a, "!e_1_a");
-    static_assert(e_1_traits::from_string("e_1_b") == e_1::e_1_b, "!e_1_b");
-    static_assert(e_1_traits::from_string("e_1_c") == e_1::e_1_c, "!e_1_c");
-    static_assert(e_1_traits::from_string("e_1_d") == e_1::e_1_d, "!e_1_d");
-    static_assert(e_1_traits::from_string("e_1_e") == e_1::e_1_e, "!e_1_e");
+    static_assert(from_string<e_1>("e_1_a") == e_1::e_1_a, "!e_1_a");
+    static_assert(from_string<e_1>("e_1_b") == e_1::e_1_b, "!e_1_b");
+    static_assert(from_string<e_1>("e_1_c") == e_1::e_1_c, "!e_1_c");
+    static_assert(from_string<e_1>("e_1_d") == e_1::e_1_d, "!e_1_d");
+    static_assert(from_string<e_1>("e_1_e") == e_1::e_1_e, "!e_1_e");
 
-    static_assert(e_1_traits::index_of(e_1::e_1_a) == 0, "!0");
-    static_assert(e_1_traits::index_of(e_1::e_1_b) == 1, "!1");
-    static_assert(e_1_traits::index_of(e_1::e_1_c) == 2, "!2");
-    static_assert(e_1_traits::index_of(e_1::e_1_d) == 3, "!3");
-    static_assert(e_1_traits::index_of(e_1::e_1_e) == 4, "!4");
+    static_assert(index_of<e_1>(e_1::e_1_a) == 0, "!0");
+    static_assert(index_of<e_1>(e_1::e_1_b) == 1, "!1");
+    static_assert(index_of<e_1>(e_1::e_1_c) == 2, "!2");
+    static_assert(index_of<e_1>(e_1::e_1_d) == 3, "!3");
+    static_assert(index_of<e_1>(e_1::e_1_e) == 4, "!4");
 
-    assert(!strcmp(e_1_traits::to_string(e_1::e_1_a), "e_1_a"));
-    assert(!strcmp(e_1_traits::to_string(e_1::e_1_b), "e_1_b"));
-    assert(!strcmp(e_1_traits::to_string(e_1::e_1_c), "e_1_c"));
-    assert(!strcmp(e_1_traits::to_string(e_1::e_1_d), "e_1_d"));
-    assert(!strcmp(e_1_traits::to_string(e_1::e_1_e), "e_1_e"));
+    assert(!strcmp(to_string(e_1::e_1_a), "e_1_a"));
+    assert(!strcmp(to_string(e_1::e_1_b), "e_1_b"));
+    assert(!strcmp(to_string(e_1::e_1_c), "e_1_c"));
+    assert(!strcmp(to_string(e_1::e_1_d), "e_1_d"));
+    assert(!strcmp(to_string(e_1::e_1_e), "e_1_e"));
 
-    assert(!strcmp(e_1_traits::name, "e_1"));
+    assert(!strcmp(name<e_1>(), "e_1"));
 
-    static_assert(e_1_traits::value(0) == e_1::e_1_a, "e_1 value[0] != e_1_a");
-    static_assert(e_1_traits::value(1) == e_1::e_1_b, "e_1 value[1] != e_1_b");
-    static_assert(e_1_traits::value(2) == e_1::e_1_c, "e_1 value[2] != e_1_c");
-    static_assert(e_1_traits::value(3) == e_1::e_1_d, "e_1 value[3] != e_1_d");
-    static_assert(e_1_traits::value(4) == e_1::e_1_e, "e_1 value[4] != e_1_e");
+    static_assert(value_of<e_1>(0) == e_1::e_1_a, "e_1 value[0] != e_1_a");
+    static_assert(value_of<e_1>(1) == e_1::e_1_b, "e_1 value[1] != e_1_b");
+    static_assert(value_of<e_1>(2) == e_1::e_1_c, "e_1 value[2] != e_1_c");
+    static_assert(value_of<e_1>(3) == e_1::e_1_d, "e_1 value[3] != e_1_d");
+    static_assert(value_of<e_1>(4) == e_1::e_1_e, "e_1 value[4] != e_1_e");
 
-    assert(e_1_iterator{} - e_1_iterator{e_1::e_1_a} == e_1_traits::count);
+    using e_1_iterator = smart_enum::enum_iterator<e_1>;
+
+    //assert(e_1_iterator{} - e_1_iterator{e_1::e_1_a} == count<e_1>());
 
     // e_2
     static_assert(sizeof(e_2) == sizeof(short), "sizeof(e_2) != sizeof(short)");
 
     // e_c_1
-    static_assert(smart_enum::enum_traits<e_c_1>::is_enum_class, "e_c_1 != enum class");
+    static_assert(is_enum_class<e_c_1>(), "e_c_1 != enum class");
 
     // e_3
-    static_assert(!smart_enum::enum_traits<e_3>::is_enum_class, "e_3 == enum class");
+    static_assert(!is_enum_class<e_3>(), "e_3 == enum class");
 
     // e_c_2
-    static_assert(smart_enum::enum_traits<e_c_2>::is_enum_class, "e_c_2 != enum class");
+    static_assert(is_enum_class<e_c_2>(), "e_c_2 != enum class");
 
     return 0;
 }
