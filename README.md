@@ -26,9 +26,11 @@ enum e_1
 };
 ```
 
-And makes following `constexpr` functions available:
+And makes following functions available:
 
 ```c++
+begin<e_1>(), end<e_1>() // random-access iterators for value enumeration
+
 count<e_1>() = 5 // number of values in enum
 
 from_string<e_1>("e_1_a") = e_1::e_1_a // converts value name to value
@@ -43,11 +45,13 @@ is_enum_class<e_1>() = false // whether enum is 'enum' or 'enum class'
 
 name<e_1>() = "e_1" // name of enum
 
+range<e_1>() // range of enum values - for(auto x : range<e_1>()) {...}
+
 to_string(e_1::e_1_a) = "e_1_a" // converts value to string
 ...
 to_string(e_1::e_1_e) = "e_1_e"
 
-value_of<e_1>(0) = e_1::e_1_a // value at specified 'index'
+value_of<e_1>(0) = e_1::e_1_a // value at specified index
 ...
 value_of<e_1>(4) = e_1::e_1_e
 ```
@@ -63,22 +67,32 @@ Macros for defining "smart" enums. The only difference is that `SMART_ENUM` gene
 - `value_name_with_optional_value` - either value name or tuple `(value_name, value)`. Example: `SMART_ENUM(e, (a, b))` defines `enum e {a, b};`, `SMART_ENUM(e, (a, (b, 10), c))` defines `enum e {a, b = 10, c};`.
 
 ###Template `smart_enum::enum_traits<T>`
+- `begin()` - random-access iterator pointing to 1st enum value
 - `count` - number of values in enum
+- `end()` - random-access iterator pointing to last + 1 enum value
 - `from_string(s)` - converts value name to its value, throws `std::invalid_argument` exception if no such value exists
 - `index_of(value)` - returns index of value in enum
 - `is_enum_class` - whether enum is `enum` or `enum class`
 - `name` - name of enum
+- `range()` - range of enum values (`for(auto a : range<T>() {...}`)
 - `to_string(value)` - converts value to its name
 - `value_of(index)` - returns value based on its index, throws `std::invalid_argument` exception if `index >= count`.
 
 ###Functions
+- `smart_enum::begin<T>()` - same as `smart_enum::enum_traits<T>::begin()`
 - `smart_enum::count<T>()` - same as `smart_enum::enum_traits<T>::count`
+- `smart_enum::end<T>()` - same as `smart_enum::enum_traits<T>::end()`
 - `smart_enum::from_string(s)` - same as `smart_enum::enum_traits<T>::from_string(s)`
 - `smart_enum::index_of(value)` - same as `smart_enum::enum_traits<T>::index_of(value)`
 - `smart_enum::is_enum_class<T>()` - same as `smart_enum::enum_traits<T>::is_enum_class`
 - `smart_enum::name<T>()` - same as `smart_enum::enum_traits<T>::name`
+- `smart_enum::range<T>()` - same as `smart_enum::enum_traits<T>::range()`
 - `smart_enum::to_string(value)` - same as `smart_enum::enum_traits<T>::to_string(value)`
 - `smart_enum::value_of<T>(index)` - same as `smart_enum::enum_traits<T>::value_of(index)`
+
+###Other
+- `smart_enum::enum_iterator<T>` - random-access enum value iterator
+- `smart_enum::enum_range<T>` - enum values range
 
 ##Library usage
 If you are using [Boost](http://www.boost.org/) >= 1.60 then just add `smart_enum.hpp` to your project and you're done.
