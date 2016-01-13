@@ -99,6 +99,14 @@ void examples_name()
     static_assert(detail::equal(name<e_1>(), "e_1"), "name<e_1>() != \"e_1\"");
 }
 
+void examples_range()
+{
+    for(auto x : range<e_1>())
+    {
+        std::cout << to_string(x) << " = " << x << std::endl;
+    }
+}
+
 void examples_to_string()
 {
     // WARNING: 'detail::equal' is implementation detail!
@@ -130,6 +138,7 @@ int main()
     examples_is_enum_class();
     examples_iterators();
     examples_name();
+    examples_range();
     examples_to_string();
 
     return 0;

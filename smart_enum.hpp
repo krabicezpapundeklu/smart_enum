@@ -128,6 +128,11 @@
                 ) 0; \
             } \
             \
+            static constexpr enum_range<NAME> range() \
+            { \
+                return enum_range<NAME>{}; \
+            } \
+            \
             static constexpr const char *to_string(NAME value) \
             { \
                 return BOOST_PP_SEQ_FOR_EACH( \
@@ -271,6 +276,23 @@ namespace smart_enum
     <
         typename T
     >
+    struct enum_range
+    {
+        constexpr enum_iterator<T> begin() const
+        {
+            return enum_traits<T>::begin();
+        }
+
+        constexpr enum_iterator<T> end() const
+        {
+            return enum_traits<T>::end();
+        }
+    };
+
+    template
+    <
+        typename T
+    >
     constexpr enum_iterator<T> begin()
     {
         return enum_traits<T>::begin();
@@ -328,6 +350,15 @@ namespace smart_enum
     constexpr const char *name()
     {
         return enum_traits<T>::name;
+    }
+
+    template
+    <
+        typename T
+    >
+    constexpr enum_range<T> range()
+    {
+        return enum_traits<T>::range();
     }
 
     template
