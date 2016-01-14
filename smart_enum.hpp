@@ -71,7 +71,7 @@
             )
 
 #define SMART_ENUM_IMPL_FROM_STRING(_, INDEX, NAME_VALUES) \
-    smart_enum::detail::equal( \
+    !std::strcmp( \
         s, BOOST_PP_STRINGIZE(SMART_ENUM_IMPL_VALUE_HEAD(INDEX, BOOST_PP_SEQ_ELEM(1, NAME_VALUES)))) \
             ? BOOST_PP_SEQ_ELEM(0, NAME_VALUES) :: \
                 SMART_ENUM_IMPL_VALUE_HEAD(INDEX, BOOST_PP_SEQ_ELEM(1, NAME_VALUES)) :
@@ -191,16 +191,6 @@ namespace smart_enum
         constexpr U get_value_or_default(T /* default_value */, U value)
         {
             return value;
-        }
-
-        constexpr bool equal_helper(const char *x, const char *y)
-        {
-            return *x == *y && (*x == '\0' || equal_helper(x + 1, y + 1));
-        }
-
-        constexpr bool equal(const char *x, const char *y)
-        {
-            return (x == nullptr && y == nullptr) || (x && y && equal_helper(x, y));
         }
     }
 
@@ -327,7 +317,7 @@ namespace smart_enum
     <
         typename T
     >
-    constexpr T from_string(const char *s)
+    T from_string(const char *s)
     {
         return enum_traits<T>::from_string(s);
     }

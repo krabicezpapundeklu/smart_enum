@@ -41,14 +41,9 @@ void examples_enum_values()
 
 void examples_from_string()
 {
-    static_assert(from_string<e_1>("e_1_a") == e_1::e_1_a,
-        "from_string<e_1>(\"e_1_a\") != e_1::e_1_a");
-
-    static_assert(from_string<e_1>("e_1_b") == e_1::e_1_b,
-        "from_string<e_1>(\"e_1_b\") != e_1::e_1_b");
-
-    static_assert(from_string<e_1>("e_1_c") == e_1::e_1_c,
-        "from_string<e_1>(\"e_1_c\") != e_1::e_1_c");
+    assert(from_string<e_1>("e_1_a") == e_1::e_1_a);
+    assert(from_string<e_1>("e_1_b") == e_1::e_1_b);
+    assert(from_string<e_1>("e_1_c") == e_1::e_1_c);
 
     try
     {
@@ -98,8 +93,7 @@ void examples_iterators()
 
 void examples_name()
 {
-    // WARNING: 'detail::equal' is implementation detail!
-    static_assert(detail::equal(name<e_1>(), "e_1"), "name<e_1>() != \"e_1\"");
+    assert(!std::strcmp(name<e_1>(), "e_1"));
 }
 
 void examples_range()
@@ -112,8 +106,7 @@ void examples_range()
 
 void examples_to_string()
 {
-    // WARNING: 'detail::equal' is implementation detail!
-    static_assert(detail::equal(to_string(e_1::e_1_a), "e_1_a"), "to_string(e_1::e_1_a) != \"e_1_a\"");
+    assert(!std::strcmp(to_string(e_1::e_1_a), "e_1_a"));
 }
 
 void examples_value_of()
