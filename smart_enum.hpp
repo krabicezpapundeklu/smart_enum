@@ -114,7 +114,7 @@
                 return enum_iterator<NAME>{}; \
             } \
             \
-            static constexpr NAME from_string(const char *s) \
+            static NAME from_string(const char *s) \
             { \
                 return BOOST_PP_REPEAT( \
                     BOOST_PP_TUPLE_SIZE(VALUES), SMART_ENUM_IMPL_FROM_STRING, (NAME)(VALUES) \
