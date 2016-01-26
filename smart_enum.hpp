@@ -7,6 +7,7 @@
 #ifndef SMART_ENUM_HEADER_INCLUDED
 #define SMART_ENUM_HEADER_INCLUDED
 
+#include <cstring>
 #include <type_traits>
 
 #include <boost/iterator/iterator_facade.hpp>
