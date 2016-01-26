@@ -4,138 +4,21 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
 
-#include <algorithm>
-#include <cassert>
-#include <iostream>
-
 #include "smart_enum.hpp"
 
-SMART_ENUM
-(
-    e_1, (e_1_a, (e_1_b, 10), e_1_c)
-)
+SMART_ENUM(a, (a, b, c))
+SMART_ENUM((b, short), (a, b, c))
 
-SMART_ENUM_CLASS
-(
-    (e_c_1, short), (a, b, c)
-)
+SMART_ENUM_CLASS(c, (a, b, c))
+SMART_ENUM_CLASS((d, short), (a, b, c))
 
-using namespace smart_enum;
+SMART_ENUM(n, a, (a, b, c))
+SMART_ENUM(n, (b, short), (a, b, c))
 
-void examples_count()
-{
-    static_assert(count<e_1>() == 3, "count<e_1>() != 3");
-}
-
-void examples_enum_size()
-{
-    static_assert(sizeof(e_c_1) == sizeof(short), "sizeof(e_1_c) != sizeof(short)");
-}
-
-void examples_enum_values()
-{
-    static_assert(e_1::e_1_a ==  0, "e_1::e_1_a !=  0");
-    static_assert(e_1::e_1_b == 10, "e_1::e_1_b != 10");
-    static_assert(e_1::e_1_c == 11, "e_1::e_1_c != 11");
-}
-
-void examples_from_string()
-{
-    assert(from_string<e_1>("e_1_a") == e_1::e_1_a);
-    assert(from_string<e_1>("e_1_b") == e_1::e_1_b);
-    assert(from_string<e_1>("e_1_c") == e_1::e_1_c);
-
-    try
-    {
-        from_string<e_1>("x");
-        assert(false);
-    }
-    catch(const std::invalid_argument &)
-    {
-    }
-}
-
-void examples_index_of()
-{
-    static_assert(index_of(e_1::e_1_a) == 0, "index_of(e_1::e_1_a) != 0");
-    static_assert(index_of(e_1::e_1_c) == 2, "index_of(e_1::e_1_c) != 2");
-}
-
-void examples_is_enum_class()
-{
-    static_assert(!is_enum_class<e_1>(), "e_1 == enum class");
-    static_assert(is_enum_class<e_c_1>(), "e_c_1 != enum class");
-}
-
-void examples_iterators()
-{
-    auto i = begin<e_1>();
-    auto e = end<e_1>();
-
-    assert(i[0] == e_1_a);
-    assert(i[1] == e_1_b);
-
-    assert(e - i ==  static_cast<std::ptrdiff_t>(count<e_1>()));
-    assert(i - e == -static_cast<std::ptrdiff_t>(count<e_1>()));
-
-    assert(*(e - 3) == e_1_a);
-
-    for(; i != e; ++i)
-    {
-        std::cout << to_string(*i) << " = " << *i << std::endl;
-    }
-
-    std::for_each(begin<e_1>(), end<e_1>(), [](e_1 x)
-    {
-        std::cout << to_string(x) << " = " << x << std::endl;
-    });
-}
-
-void examples_name()
-{
-    assert(!std::strcmp(name<e_1>(), "e_1"));
-}
-
-void examples_range()
-{
-    for(auto x : range<e_1>())
-    {
-        std::cout << to_string(x) << " = " << x << std::endl;
-    }
-}
-
-void examples_to_string()
-{
-    assert(!std::strcmp(to_string(e_1::e_1_a), "e_1_a"));
-}
-
-void examples_value_of()
-{
-    static_assert(value_of<e_1>(0) == e_1::e_1_a, "value_of<e_1>(0) != e_1::e_1_a");
-    static_assert(value_of<e_1>(2) == e_1::e_1_c, "value_of<e_1>(2) != e_1::e_1_c");
-
-    try
-    {
-        value_of<e_1>(3);
-        assert(false);
-    }
-    catch(const std::invalid_argument &)
-    {
-    }
-}
+SMART_ENUM_CLASS(n, c, (a, b, c))
+SMART_ENUM_CLASS(n, (d, short), (a, b, c))
 
 int main()
 {
-    examples_count();
-    examples_enum_size();
-    examples_enum_values();
-    examples_from_string();
-    examples_index_of();
-    examples_is_enum_class();
-    examples_iterators();
-    examples_name();
-    examples_range();
-    examples_to_string();
-
     return 0;
 }
