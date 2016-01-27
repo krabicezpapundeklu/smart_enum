@@ -7,8 +7,13 @@
 #ifndef SMART_ENUM_HEADER_INCLUDED
 #define SMART_ENUM_HEADER_INCLUDED
 
+// clang++ examples.cpp -I. -std=c++11 -Werror -Weverything -Wno-c++98-compat-pedantic (3.5.2)
+// g++ examples.cpp -I. -std=c++11 -Wall -Weffc++ -Werror -Wextra -pedantic (4.7.3, 4.9.2)
+
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
+#include <boost/preprocessor/seq/seq.hpp>
 #include <boost/preprocessor/tuple/pop_front.hpp>
+#include <boost/preprocessor/tuple/to_seq.hpp>
 
 #define SMART_ENUM(...) \
     SMART_ENUM_IMPL(, __VA_ARGS__)
@@ -49,7 +54,7 @@
     BOOST_PP_IIF \
     ( \
         BOOST_PP_DEC(BOOST_PP_TUPLE_SIZE(NAME_SIZE)), \
-            : BOOST_PP_TUPLE_ELEM(1, NAME_SIZE), \
+            : SMART_ENUM_IMPL_REMOVE_PARENS BOOST_PP_SEQ_TAIL(BOOST_PP_TUPLE_TO_SEQ(NAME_SIZE)), \
     )
 
 #define SMART_ENUM_IMPL_NAMESPACES(CLASS, ENUM, NAMESPACES) \
@@ -62,5 +67,8 @@
 
 #define SMART_ENUM_IMPL_NAMESPACE_START(_, INDEX, NAMESPACES) \
     namespace BOOST_PP_TUPLE_ELEM(INDEX, NAMESPACES) {
+
+#define SMART_ENUM_IMPL_REMOVE_PARENS(ARG) \
+    ARG
 
 #endif
