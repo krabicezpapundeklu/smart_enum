@@ -6,20 +6,11 @@
 
 #include "smart_enum.hpp"
 
-SMART_ENUM(a, (a, b, c))
+SMART_ENUM(e_1, (e_1_a, e_1_b, e_1_c))
+SMART_ENUM(n_1, e_2, (e_2_a, e_2_b, e_2_c))
 
-SMART_ENUM((b, short), (a, b, c))
-
-SMART_ENUM_CLASS(c, (a, b, c))
-SMART_ENUM_CLASS((d, short), (a, b, c))
-
-SMART_ENUM(n, e, (a, b, c))
-SMART_ENUM(n, (f, short), (a, b, c))
-SMART_ENUM((n, a), (g, short), (a, b, c))
-SMART_ENUM((n, a), h, (a, b, c))
-
-SMART_ENUM_CLASS(n, i, (a, b, c))
-SMART_ENUM_CLASS(n, (j, short), (a, b, c))
+SMART_ENUM_CLASS((n_1, n_2), e_3, (e_3_a, e_3_b, e_3_c))
+SMART_ENUM_CLASS((n_1, n_2), (e_4, short), (e_4_a, e_4_b, e_4_c))
 
 int main()
 {
