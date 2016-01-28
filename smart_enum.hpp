@@ -10,8 +10,7 @@
 #include <boost/config.hpp>
 #include <boost/preprocessor/arithmetic/dec.hpp>
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
-#include <boost/preprocessor/tuple/elem.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
 
 #define SMART_ENUM(NAMESPACE_OR_NAME, ...) \
@@ -33,9 +32,9 @@
 #endif
 
 #define SMART_ENUM_IMPL_1(CLASS, NAME, MEMBERS) \
-    enum CLASS SMART_ENUM_IMPL_NAME_SIZE(SMART_ENUM_IMPL_ARG_TO_TUPLE(NAME)) \
+    enum CLASS SMART_ENUM_IMPL_PROCESS_TUPLE(NAME_SIZE, SMART_ENUM_IMPL_ARG_TO_TUPLE(NAME)) \
     { \
-        BOOST_PP_TUPLE_ENUM(MEMBERS) \
+        SMART_ENUM_IMPL_MEMBERS(MEMBERS) \
     };
 
 #define SMART_ENUM_IMPL_2(CLASS, NAMESPACE, NAME, MEMBERS) \
@@ -44,15 +43,22 @@
 #define SMART_ENUM_IMPL_ARG_TO_TUPLE(ARG) \
     (BOOST_PP_REMOVE_PARENS(ARG))
 
-#define SMART_ENUM_IMPL_NAME_SIZE(NAME_SIZE) \
-    BOOST_PP_TUPLE_ELEM(0, NAME_SIZE) \
-    BOOST_PP_IIF \
-    ( \
-        BOOST_PP_DEC(BOOST_PP_TUPLE_SIZE(NAME_SIZE)), \
-            SMART_ENUM_IMPL_NAME_SIZE_1, BOOST_PP_TUPLE_EAT(1) \
-    )NAME_SIZE
+#define SMART_ENUM_IMPL_MEMBER(NAME, VALUE) \
+    = VALUE
 
-#define SMART_ENUM_IMPL_NAME_SIZE_1(NAME, SIZE) \
+#define SMART_ENUM_IMPL_MEMBERS(MEMBERS) \
+    BOOST_PP_ENUM \
+    ( \
+        BOOST_PP_TUPLE_SIZE(MEMBERS), SMART_ENUM_IMPL_MEMBERS_1, MEMBERS \
+    )
+
+#define SMART_ENUM_IMPL_MEMBERS_1(_, INDEX, MEMBERS) \
+    SMART_ENUM_IMPL_PROCESS_TUPLE \
+    ( \
+        MEMBER, SMART_ENUM_IMPL_ARG_TO_TUPLE(BOOST_PP_TUPLE_ELEM(INDEX, MEMBERS)) \
+    )
+
+#define SMART_ENUM_IMPL_NAME_SIZE(NAME, SIZE) \
     : SIZE
 
 #define SMART_ENUM_IMPL_NAMESPACES(CLASS, NAMESPACES, NAME, MEMBERS) \
@@ -65,6 +71,15 @@
 
 #define SMART_ENUM_IMPL_NAMESPACES_START(_, INDEX, NAMESPACES) \
     namespace BOOST_PP_TUPLE_ELEM(INDEX, NAMESPACES) {
+
+#define SMART_ENUM_IMPL_PROCESS_TUPLE(MACRO, TUPLE) \
+    BOOST_PP_TUPLE_ELEM(0, TUPLE) \
+    BOOST_PP_IIF \
+    ( \
+        BOOST_PP_DEC(BOOST_PP_TUPLE_SIZE(TUPLE)), \
+            SMART_ENUM_IMPL_ ## MACRO, BOOST_PP_TUPLE_EAT(1) \
+    ) \
+    TUPLE
 
 #define SMART_ENUM_IMPL_REPEAT(MACRO, TUPLE) \
     BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(TUPLE), SMART_ENUM_IMPL_ ## MACRO, TUPLE)
