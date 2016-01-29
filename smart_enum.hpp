@@ -10,6 +10,8 @@
 #include <boost/config.hpp>
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
 #include <boost/preprocessor/tuple/pop_front.hpp>
+#include <boost/preprocessor/tuple/push_back.hpp>
+#include <boost/preprocessor/stringize.hpp>
 
 #define SMART_ENUM(NAMESPACE_OR_NAME, ...) \
     SMART_ENUM_IMPL(, NAMESPACE_OR_NAME, __VA_ARGS__)
@@ -21,12 +23,12 @@
     #define SMART_ENUM_IMPL(CLASS, NAMESPACE_OR_NAME, ...) \
         BOOST_PP_CAT \
         ( \
-            BOOST_PP_OVERLOAD(SMART_ENUM_IMPL_, __VA_ARGS__)(CLASS, _, NAMESPACE_OR_NAME, __VA_ARGS__), \
+            BOOST_PP_OVERLOAD(SMART_ENUM_IMPL_, __VA_ARGS__)(CLASS, , NAMESPACE_OR_NAME, __VA_ARGS__), \
             BOOST_PP_EMPTY() \
         )
 #else
     #define SMART_ENUM_IMPL(CLASS, NAMESPACE_OR_NAME, ...) \
-        BOOST_PP_OVERLOAD(SMART_ENUM_IMPL_, __VA_ARGS__)(CLASS, _, NAMESPACE_OR_NAME, __VA_ARGS__)
+        BOOST_PP_OVERLOAD(SMART_ENUM_IMPL_, __VA_ARGS__)(CLASS, , NAMESPACE_OR_NAME, __VA_ARGS__)
 #endif
 
 #define SMART_ENUM_IMPL_1(CLASS, NAMESPACES, NAME, MEMBERS) \
@@ -35,7 +37,12 @@
         { \
             SMART_ENUM_IMPL_MEMBERS(MEMBERS) \
         }; \
-    SMART_ENUM_IMPL_REPEAT(NAMESPACES_END, NAMESPACES)
+    SMART_ENUM_IMPL_REPEAT(NAMESPACES_END, NAMESPACES) \
+    \
+    SMART_ENUM_IMPL_TRAITS \
+    ( \
+        NAMESPACES, NAME, MEMBERS \
+    )
 
 #define SMART_ENUM_IMPL_2(CLASS, _, NAMESPACES, NAME, MEMBERS) \
     SMART_ENUM_IMPL_1 \
@@ -71,6 +78,12 @@
 #define SMART_ENUM_IMPL_NAME_SIZE(NAME, SIZE) \
     : SIZE
 
+#define SMART_ENUM_IMPL_NAMESPACE(_, INDEX, NAMESPACES) \
+    BOOST_PP_TUPLE_ELEM(INDEX, NAMESPACES) ::
+
+#define SMART_ENUM_IMPL_NAMESPACE_STRING(_, INDEX, NAMESPACES) \
+    BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(INDEX, NAMESPACES)) "::"
+
 #define SMART_ENUM_IMPL_NAMESPACES_END(_, INDEX, NAMESPACES) \
     }
 
@@ -92,5 +105,39 @@
         BOOST_PP_IS_BEGIN_PARENS(TUPLE), \
             BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(TUPLE), SMART_ENUM_IMPL_ ## MACRO, TUPLE) \
     )
+
+#define SMART_ENUM_IMPL_TRAITS(NAMESPACES, NAME, MEMBERS) \
+    SMART_ENUM_IMPL_TRAITS_1 \
+    ( \
+        NAMESPACES, \
+        BOOST_PP_TUPLE_ELEM(0, SMART_ENUM_IMPL_ARG_TO_TUPLE(NAME)), \
+        MEMBERS \
+    )
+
+#define SMART_ENUM_IMPL_TRAITS_1(NAMESPACES, NAME, MEMBERS) \
+    SMART_ENUM_IMPL_TRAITS_2 \
+    ( \
+        NAME, \
+        SMART_ENUM_IMPL_REPEAT(NAMESPACE, NAMESPACES) NAME, \
+        SMART_ENUM_IMPL_REPEAT(NAMESPACE_STRING, NAMESPACES) BOOST_PP_STRINGIZE(NAME), \
+        MEMBERS \
+    )
+
+#define SMART_ENUM_IMPL_TRAITS_2(NAME, FULL_NAME, FULL_NAME_STRING, MEMBERS) \
+    namespace smart_enum \
+    { \
+        template<> struct enum_traits<FULL_NAME> \
+        { \
+            static constexpr auto name = BOOST_PP_STRINGIZE(NAME); \
+            static constexpr auto full_name = FULL_NAME_STRING; \
+        }; \
+    }
+
+namespace smart_enum
+{
+    template<typename Enum> struct enum_traits
+    {
+    };
+}
 
 #endif
