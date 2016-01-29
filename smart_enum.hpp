@@ -9,6 +9,8 @@
 
 #include <boost/config.hpp>
 #include <boost/preprocessor/arithmetic/dec.hpp>
+#include <boost/preprocessor/control/expr_iif.hpp>
+#include <boost/preprocessor/logical/not.hpp>
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
@@ -43,7 +45,14 @@
 #define SMART_ENUM_IMPL_ARG_TO_TUPLE(ARG) \
     (BOOST_PP_REMOVE_PARENS(ARG))
 
-#define SMART_ENUM_IMPL_MEMBER(NAME, VALUE) \
+#define SMART_ENUM_IMPL_MEMBER(NAME, ...) \
+    BOOST_PP_EXPR_IIF \
+    ( \
+        BOOST_PP_NOT(BOOST_PP_IS_BEGIN_PARENS(__VA_ARGS__)), \
+            SMART_ENUM_IMPL_MEMBER_1(__VA_ARGS__, _) \
+    )
+
+#define SMART_ENUM_IMPL_MEMBER_1(VALUE, ...) \
     = VALUE
 
 #define SMART_ENUM_IMPL_MEMBERS(MEMBERS) \
@@ -74,7 +83,7 @@
 
 #define SMART_ENUM_IMPL_PROCESS_TUPLE(MACRO, TUPLE) \
     BOOST_PP_TUPLE_ELEM(0, TUPLE) \
-    BOOST_PP_IIF \
+    BOOST_PP_IF \
     ( \
         BOOST_PP_DEC(BOOST_PP_TUPLE_SIZE(TUPLE)), \
             SMART_ENUM_IMPL_ ## MACRO, BOOST_PP_TUPLE_EAT(1) \
