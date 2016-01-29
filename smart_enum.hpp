@@ -9,9 +9,9 @@
 
 #include <boost/config.hpp>
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
+#include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/pop_front.hpp>
 #include <boost/preprocessor/tuple/push_back.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #define SMART_ENUM(NAMESPACE_OR_NAME, ...) \
     SMART_ENUM_IMPL(, NAMESPACE_OR_NAME, __VA_ARGS__)
@@ -23,12 +23,12 @@
     #define SMART_ENUM_IMPL(CLASS, NAMESPACE_OR_NAME, ...) \
         BOOST_PP_CAT \
         ( \
-            BOOST_PP_OVERLOAD(SMART_ENUM_IMPL_, __VA_ARGS__)(CLASS, , NAMESPACE_OR_NAME, __VA_ARGS__), \
+            BOOST_PP_OVERLOAD(SMART_ENUM_IMPL_, __VA_ARGS__)(CLASS, _, NAMESPACE_OR_NAME, __VA_ARGS__), \
             BOOST_PP_EMPTY() \
         )
 #else
     #define SMART_ENUM_IMPL(CLASS, NAMESPACE_OR_NAME, ...) \
-        BOOST_PP_OVERLOAD(SMART_ENUM_IMPL_, __VA_ARGS__)(CLASS, , NAMESPACE_OR_NAME, __VA_ARGS__)
+        BOOST_PP_OVERLOAD(SMART_ENUM_IMPL_, __VA_ARGS__)(CLASS, _, NAMESPACE_OR_NAME, __VA_ARGS__)
 #endif
 
 #define SMART_ENUM_IMPL_1(CLASS, NAMESPACES, NAME, MEMBERS) \
