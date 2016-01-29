@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
 
+#include <iostream>
+
 #include "smart_enum.hpp"
 
 
@@ -15,5 +17,13 @@ SMART_ENUM_CLASS((n_1, n_2), (e_4, short), (e_4_a, (e_4_b, 10), (e_4_c, (false))
 
 int main()
 {
+    using namespace smart_enum;
+
+    std::cout << enum_traits<e_1>::name << std::endl;
+    std::cout << enum_traits<e_1>::full_name << std::endl;
+
+    std::cout << enum_traits<n_1::n_2::e_4>::name << std::endl;
+    std::cout << enum_traits<n_1::n_2::e_4>::full_name << std::endl;
+
     return 0;
 }
