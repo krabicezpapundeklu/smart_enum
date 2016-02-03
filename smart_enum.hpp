@@ -8,7 +8,6 @@
 #ifndef SMART_ENUM_HEADER_INCLUDED
 #define SMART_ENUM_HEADER_INCLUDED
 
-#include <boost/config.hpp>
 #include <boost/preprocessor.hpp>
 
 #define SMART_ENUM(...) \
@@ -17,7 +16,7 @@
 #define SMART_ENUM_CLASS(...) \
     SMART_ENUM_IMPL(class, __VA_ARGS__)
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
     #define SMART_ENUM_IMPL(CLASS, ...) \
         BOOST_PP_CAT \
         ( \
@@ -67,7 +66,7 @@
     { \
         switch(value) \
         { \
-            SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, SMART_ENUM_IMPL_MEMBER_ADDITIONAL_DATA) \
+            SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_ADDITIONAL_DATA) \
         } \
     }
 
@@ -87,7 +86,7 @@
 
 // member definitions
 #define SMART_ENUM_IMPL_MEMBER_DEFINITIONS(MEMBERS) \
-    SMART_ENUM_IMPL_ENUM_MEMBERS(_, MEMBERS, SMART_ENUM_IMPL_MEMBER_DEFINITION)
+    SMART_ENUM_IMPL_ENUM_MEMBERS(_, MEMBERS, MEMBER_DEFINITION)
 
 #define SMART_ENUM_IMPL_MEMBER_DEFINITION(_, NAME, MEMBER) \
     NAME \
@@ -106,7 +105,7 @@
 #define SMART_ENUM_IMPL_FROM_STRING(PREFIX, MEMBERS) \
     static PREFIX from_string(const char *s) \
     { \
-        return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, SMART_ENUM_IMPL_MEMBER_FROM_STRING) throw std::invalid_argument("s"); \
+        return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_FROM_STRING) throw std::invalid_argument("s"); \
     }
 
 #define SMART_ENUM_IMPL_MEMBER_FROM_STRING(PREFIX, NAME, _) \
@@ -116,7 +115,7 @@
 #define SMART_ENUM_IMPL_TO_STRING(PREFIX, MEMBERS) \
     static constexpr const char *to_string(PREFIX value) \
     { \
-        return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, SMART_ENUM_IMPL_MEMBER_TO_STRING) throw std::invalid_argument("s"); \
+        return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_TO_STRING) throw std::invalid_argument("s"); \
     }
 
 #define SMART_ENUM_IMPL_MEMBER_TO_STRING(PREFIX, NAME, _) \
@@ -165,6 +164,6 @@
     )
 
 #define SMART_ENUM_IMPL_PROCESS_MEMBERS_2(PREFIX, MEMBER, MACRO) \
-    MACRO(PREFIX, BOOST_PP_TUPLE_ELEM(0, MEMBER), MEMBER)
+    BOOST_PP_CAT(SMART_ENUM_IMPL_, MACRO)(PREFIX, BOOST_PP_TUPLE_ELEM(0, MEMBER), MEMBER)
 
 #endif
