@@ -6,52 +6,79 @@
 
 #include "smart_enum.hpp"
 
-// SMART_ENUM_IMPL_ADDITIONAL_DATA(n_1::n_2::e_1_c, ((a), (b, 10), (c, (1, 2, 3)), (d, 20, (4, 5, 6))))
+#include <cassert>
+#include <cstring>
 
-/*
-SMART_ENUM_IMPL_MEMBER_DEFINITION((a))
-SMART_ENUM_IMPL_MEMBER_DEFINITION((b, 10))
-SMART_ENUM_IMPL_MEMBER_DEFINITION((c, (1, 2, 3)))
-SMART_ENUM_IMPL_MEMBER_DEFINITION((d, 20, (4, 5, 6)))
-*/
+using namespace smart_enum;
 
-//SMART_ENUM_IMPL_MEMBER_DEFINITIONS(((a), (b, 10), (c, (1, 2, 3)), (d, 20, (4, 5, 6))))
+SMART_ENUM(e_1, (e_1_a, (e_1_b, 10), (e_1_c, (1, 2, "x")), (e_1_d, 20, (4, 5, "y"))))
+SMART_ENUM(n_1, (e_2, short), (e_2_a, (e_2_b, 10), (e_2_c, (1, 2, "x")), (e_2_d, 20, (4, 5, "y"))))
+SMART_ENUM((n_1, n_2), e_3, (e_3_a, (e_3_b, 10), (e_3_c, (1, 2, "x")), (e_3_d, 20, (4, 5, "y"))))
 
-/*
-SMART_ENUM_IMPL_MEMBER_FROM_STRING(n_1::n_2::e_1_c, (a))
-SMART_ENUM_IMPL_MEMBER_FROM_STRING(n_1::n_2::e_1_c, (b, 10))
-SMART_ENUM_IMPL_MEMBER_FROM_STRING(n_1::n_2::e_1_c, (c, (1, 2, 3)))
-SMART_ENUM_IMPL_MEMBER_FROM_STRING(n_1::n_2::e_1_c, (d, 20, (4, 5, 6)))
-*/
+#define STATIC_ASSERT(EXPR) \
+    static_assert(EXPR, "! " # EXPR)
 
-// SMART_ENUM_IMPL_FROM_STRING(n_1::n_2::e_1_c, ((a), (b, 10), (c, (1, 2, 3)), (d, 20, (4, 5, 6))))
+constexpr bool equal(const char *x, const char *y);
+constexpr bool equal_helper(const char *x, const char *y);
 
-/*
-SMART_ENUM_IMPL_MEMBER_TO_STRING(n_1::n_2::e_1_c, (a))
-SMART_ENUM_IMPL_MEMBER_TO_STRING(n_1::n_2::e_1_c, (b, 10))
-SMART_ENUM_IMPL_MEMBER_TO_STRING(n_1::n_2::e_1_c, (c, (1, 2, 3)))
-SMART_ENUM_IMPL_MEMBER_TO_STRING(n_1::n_2::e_1_c, (d, 20, (4, 5, 6)))
-*/
+void test_count();
+void test_from_string();
+void test_full_name();
+void test_name();
+void test_to_string();
 
-// SMART_ENUM_IMPL_TO_STRING(n_1::n_2::e_1_c, ((a), (b, 10), (c, (1, 2, 3)), (d, 20, (4, 5, 6))))
+constexpr bool equal(const char *x, const char *y)
+{
+    return (x == nullptr && y == nullptr) || (x && y && equal_helper(x, y));
+}
 
-/*
-SMART_ENUM(e_1, (e_1_a, (e_1_b, 10), (e_1_c, (1, 2, 3)), (e_1_d, 20, (4, 5, 6))))
-SMART_ENUM(n_1, (e_2, short), (e_2_a, (e_2_b, 10), (e_2_c, (1, 2, 3)), (e_2_d, 20, (4, 5, 6))))
-SMART_ENUM((n_1, n_2), e_3, (e_3_a, (e_3_b, 10), (e_3_c, (1, 2, 3)), (e_3_d, 20, (4, 5, 6))))
-*/
+constexpr bool equal_helper(const char *x, const char *y)
+{
+    return *x == *y && (*x == '\0' || equal_helper(x + 1, y + 1));
+}
 
-/*
-SMART_ENUM_IMPL_FULL_NAME(_, e_1)
-SMART_ENUM_IMPL_FULL_NAME((n_1), e_1)
-SMART_ENUM_IMPL_FULL_NAME((n_1, n_2), e_1)
-*/
+void test_count()
+{
+    STATIC_ASSERT(count<e_1>() == 4);
+    STATIC_ASSERT(count<n_1::e_2>() == 4);
+    STATIC_ASSERT(count<n_1::n_2::e_3>() == 4);
+}
 
-SMART_ENUM_IMPL_FULL_NAME_STRING(_, e_1)
-SMART_ENUM_IMPL_FULL_NAME_STRING((n_1), e_1)
-SMART_ENUM_IMPL_FULL_NAME_STRING((n_1, n_2), e_1)
+void test_from_string()
+{
+    assert(from_string<e_1>("e_1_a") == e_1::e_1_a);
+    assert(from_string<n_1::e_2>("e_2_a") == n_1::e_2::e_2_a);
+    assert(from_string<n_1::n_2::e_3>("e_3_a") == n_1::n_2::e_3::e_3_a);
+}
+
+void test_full_name()
+{
+    STATIC_ASSERT(equal(full_name<e_1>(), "e_1"));
+    STATIC_ASSERT(equal(full_name<n_1::e_2>(), "n_1::e_2"));
+    STATIC_ASSERT(equal(full_name<n_1::n_2::e_3>(), "n_1::n_2::e_3"));
+}
+
+void test_name()
+{
+    STATIC_ASSERT(equal(name<e_1>(), "e_1"));
+    STATIC_ASSERT(equal(name<n_1::e_2>(), "e_2"));
+    STATIC_ASSERT(equal(name<n_1::n_2::e_3>(), "e_3"));
+}
+
+void test_to_string()
+{
+    STATIC_ASSERT(equal(to_string(e_1::e_1_a), "e_1_a"));
+    STATIC_ASSERT(equal(to_string(n_1::e_2::e_2_a), "e_2_a"));
+    STATIC_ASSERT(equal(to_string(n_1::n_2::e_3::e_3_a), "e_3_a"));
+}
 
 int main()
 {
+    test_count();
+    test_from_string();
+    test_full_name();
+    test_name();
+    test_to_string();
+
     return 0;
 }

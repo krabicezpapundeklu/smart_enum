@@ -8,6 +8,8 @@
 #ifndef SMART_ENUM_HEADER_INCLUDED
 #define SMART_ENUM_HEADER_INCLUDED
 
+#include <stdexcept>
+
 #include <boost/preprocessor.hpp>
 
 #define SMART_ENUM(...) \
@@ -37,7 +39,7 @@
 #define SMART_ENUM_IMPL_DEFINITION(CLASS, NAMESPACES, NAME, MEMBERS) \
     SMART_ENUM_IMPL_DEFINITION_1 \
     ( \
-        CLASS, NAMESPACES, SMART_ENUM_IMPL_ARG_TO_TUPLE(NAME), (SMART_ENUM_IMPL_ARGS_TO_TUPLES(MEMBERS))) \
+        CLASS, NAMESPACES, SMART_ENUM_IMPL_ARG_TO_TUPLE(NAME), (SMART_ENUM_IMPL_ARGS_TO_TUPLES(MEMBERS)) \
     )
 
 #define SMART_ENUM_IMPL_DEFINITION_1(CLASS, NAMESPACES, NAME, MEMBERS) \
@@ -47,6 +49,8 @@
             SMART_ENUM_IMPL_MEMBER_DEFINITIONS(MEMBERS) \
         }; \
     SMART_ENUM_IMPL_REPEAT(NAMESPACE_END, NAMESPACES) \
+    \
+    SMART_ENUM_IMPL_TRAITS(NAMESPACES, BOOST_PP_TUPLE_ELEM(0, NAME), MEMBERS)
 
 #define SMART_ENUM_IMPL_NAME_SIZE(NAME_SIZE) \
     BOOST_PP_TUPLE_ELEM(0, NAME_SIZE) \
@@ -59,6 +63,34 @@
 
 #define SMART_ENUM_IMPL_NAME_SIZE_1(NAME, SIZE) \
     : SIZE
+
+// traits
+#define SMART_ENUM_IMPL_TRAITS(NAMESPACES, NAME, MEMBERS) \
+    SMART_ENUM_IMPL_TRAITS_1 \
+    ( \
+        SMART_ENUM_IMPL_FULL_NAME(NAMESPACES, NAME), \
+        SMART_ENUM_IMPL_FULL_NAME_STRING(NAMESPACES, NAME), \
+        NAME, \
+        MEMBERS \
+    )
+
+#define SMART_ENUM_IMPL_TRAITS_1(FULL_NAME, FULL_NAME_STRING, NAME, MEMBERS) \
+    namespace smart_enum \
+    { \
+        template<> struct enum_traits<FULL_NAME> \
+        { \
+            using type = FULL_NAME; \
+            \
+            static constexpr const char *name = BOOST_PP_STRINGIZE(NAME); \
+            static constexpr const char *full_name = FULL_NAME_STRING; \
+            \
+            static constexpr std::size_t count = BOOST_PP_TUPLE_SIZE(MEMBERS); \
+            \
+            SMART_ENUM_IMPL_ADDITIONAL_DATA(FULL_NAME, MEMBERS) \
+            SMART_ENUM_IMPL_FROM_STRING(FULL_NAME, MEMBERS) \
+            SMART_ENUM_IMPL_TO_STRING(FULL_NAME, MEMBERS) \
+        }; \
+    }
 
 // full name
 #define SMART_ENUM_IMPL_FULL_NAME(NAMESPACES, NAME) \
@@ -182,5 +214,59 @@
 
 #define SMART_ENUM_IMPL_PROCESS_MEMBERS_2(PREFIX, MEMBER, MACRO) \
     BOOST_PP_CAT(SMART_ENUM_IMPL_, MACRO)(PREFIX, BOOST_PP_TUPLE_ELEM(0, MEMBER), MEMBER)
+
+namespace smart_enum
+{
+    template
+    <
+        typename Enum
+    >
+    struct enum_traits {};
+
+    template
+    <
+        typename Enum
+    >
+    constexpr std::size_t count()
+    {
+        return enum_traits<Enum>::count;
+    }
+
+    template
+    <
+        typename Enum
+    >
+    Enum from_string(const char *s)
+    {
+        return enum_traits<Enum>::from_string(s);
+    }
+
+    template
+    <
+        typename Enum
+    >
+    constexpr const char *full_name()
+    {
+        return enum_traits<Enum>::full_name;
+    }
+
+    template
+    <
+        typename Enum
+    >
+    constexpr const char *name()
+    {
+        return enum_traits<Enum>::name;
+    }
+
+    template
+    <
+        typename Enum
+    >
+    constexpr const char *to_string(Enum value)
+    {
+        return enum_traits<Enum>::to_string(value);
+    }
+}
 
 #endif

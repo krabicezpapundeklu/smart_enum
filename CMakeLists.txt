@@ -18,7 +18,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_definitions("-Wall -Weffc++ -Werror -Wextra -pedantic")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    add_definitions("/Wall /WX")
+    add_definitions("/Wall /WX /wd4514 /wd4710")
 endif()
 
 add_executable(smart_enum examples.cpp smart_enum.hpp)
