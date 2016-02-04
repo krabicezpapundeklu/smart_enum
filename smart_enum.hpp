@@ -109,14 +109,16 @@
 #define SMART_ENUM_IMPL_ADDITIONAL_DATA(PREFIX, MEMBERS) \
     template \
     < \
-        typename T \
+        typename Action \
     > \
-    static typename T::result_type apply(PREFIX value, T action) \
+    static auto apply(PREFIX value, Action action) -> decltype(action()) \
     { \
         switch(value) \
         { \
             SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_ADDITIONAL_DATA) \
         } \
+        \
+        throw std::invalid_argument("value"); \
     }
 
 #define SMART_ENUM_IMPL_MEMBER_ADDITIONAL_DATA(PREFIX, NAME, MEMBER) \
@@ -222,6 +224,15 @@ namespace smart_enum
         typename Enum
     >
     struct enum_traits {};
+
+    template
+    <
+        typename Enum, typename Action
+    >
+    auto apply(Enum value, Action action) -> decltype(action())
+    {
+        return enum_traits<Enum>::apply(value, action);
+    }
 
     template
     <

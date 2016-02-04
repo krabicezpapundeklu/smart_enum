@@ -21,6 +21,7 @@ SMART_ENUM((n_1, n_2), e_3, (e_3_a, (e_3_b, 10), (e_3_c, (1, 2, "x")), (e_3_d, 2
 constexpr bool equal(const char *x, const char *y);
 constexpr bool equal_helper(const char *x, const char *y);
 
+void test_additional_data();
 void test_count();
 void test_from_string();
 void test_full_name();
