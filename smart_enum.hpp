@@ -78,7 +78,7 @@
 #define SMART_ENUM_IMPL_TRAITS_1(FULL_NAME, FULL_NAME_STRING, NAME, MEMBERS) \
     namespace smart_enum \
     { \
-        template<> struct enum_traits<FULL_NAME> \
+        template<> struct enum_traits<FULL_NAME> : detail::enum_traits_base<FULL_NAME> \
         { \
             using type = FULL_NAME; \
             \
@@ -273,6 +273,23 @@ namespace smart_enum
     >
     struct enum_range;
 
+    namespace detail
+    {
+        template
+        <
+            typename Enum
+        >
+        struct enum_traits_base
+        {
+            static constexpr bool is_enum_class =
+                std::integral_constant
+                <
+                    bool, std::is_enum<Enum>::value && !std::is_convertible<Enum, int>::value
+                >
+                ::value;
+        };
+    }
+
     template
     <
         typename Enum
@@ -340,6 +357,15 @@ namespace smart_enum
     constexpr std::size_t index_of(Enum value)
     {
         return enum_traits<Enum>::index_of(value);
+    }
+
+    template
+    <
+        typename Enum
+    >
+    constexpr bool is_enum_class()
+    {
+        return enum_traits<Enum>::is_enum_class;
     }
 
     template

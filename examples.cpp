@@ -22,8 +22,8 @@ SMART_ENUM_CLASS((n_1, n_2), e_3, (e_3_a, (e_3_b, 10), (e_3_c, (1, 2, "x")), (e_
 constexpr bool equal(const char *x, const char *y);
 constexpr bool equal_helper(const char *x, const char *y);
 
-void test_additional_data();
 void test_count();
+void test_enum_class();
 void test_from_string();
 void test_full_name();
 void test_index_of();
@@ -50,6 +50,14 @@ void test_count()
     STATIC_ASSERT(count<e_1>() == 4);
     STATIC_ASSERT(count<n_1::e_2>() == 4);
     STATIC_ASSERT(count<n_1::n_2::e_3>() == 4);
+}
+
+void test_enum_class()
+{
+    STATIC_ASSERT(!is_enum_class<e_1>());
+    STATIC_ASSERT(!is_enum_class<n_1::e_2>());
+
+    STATIC_ASSERT(is_enum_class<n_1::n_2::e_3>());
 }
 
 void test_from_string()
@@ -138,6 +146,7 @@ void test_values()
 int main()
 {
     test_count();
+    test_enum_class();
     test_from_string();
     test_full_name();
     test_index_of();
