@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <iostream>
 
 using namespace smart_enum;
 
@@ -26,7 +27,9 @@ void test_count();
 void test_from_string();
 void test_full_name();
 void test_index_of();
+void test_iterators();
 void test_name();
+void test_range();
 void test_to_string();
 void test_value_of();
 
@@ -69,11 +72,37 @@ void test_index_of()
     STATIC_ASSERT(index_of(e_1::e_1_d) == 3);
 }
 
+void test_iterators()
+{
+    auto i = begin<e_1>();
+    auto j = end<e_1>();
+
+    assert(i[0] == e_1::e_1_a);
+    assert(i[3] == e_1::e_1_d);
+
+    assert(static_cast<std::size_t>(j - i) == count<e_1>());
+
+    assert(*(j - 1) == e_1::e_1_d);
+
+    for(; i != j; ++i)
+    {
+        std::cout << to_string(*i) << " = " << *i << std::endl;
+    }
+}
+
 void test_name()
 {
     STATIC_ASSERT(equal(name<e_1>(), "e_1"));
     STATIC_ASSERT(equal(name<n_1::e_2>(), "e_2"));
     STATIC_ASSERT(equal(name<n_1::n_2::e_3>(), "e_3"));
+}
+
+void test_range()
+{
+    for(auto e : range<e_1>())
+    {
+        std::cout << to_string(e) << " = " << e << std::endl;
+    }
 }
 
 void test_to_string()
@@ -97,7 +126,9 @@ int main()
     test_from_string();
     test_full_name();
     test_index_of();
+    test_iterators();
     test_name();
+    test_range();
     test_to_string();
     test_value_of();
 
