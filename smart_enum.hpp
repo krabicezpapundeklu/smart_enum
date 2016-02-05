@@ -88,6 +88,7 @@
             \
             SMART_ENUM_IMPL_ADDITIONAL_DATA(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_FROM_STRING(FULL_NAME, MEMBERS) \
+            SMART_ENUM_IMPL_INDEX_OF(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_TO_STRING(FULL_NAME, MEMBERS) \
         }; \
     }
@@ -121,7 +122,7 @@
         throw std::invalid_argument("value"); \
     }
 
-#define SMART_ENUM_IMPL_MEMBER_ADDITIONAL_DATA(PREFIX, NAME, MEMBER) \
+#define SMART_ENUM_IMPL_MEMBER_ADDITIONAL_DATA(PREFIX, NAME, MEMBER, INDEX) \
     case PREFIX :: NAME: return action \
         SMART_ENUM_IMPL_MEMBER_ADDITIONAL_DATA_1 \
         ( \
@@ -139,7 +140,7 @@
 #define SMART_ENUM_IMPL_MEMBER_DEFINITIONS(MEMBERS) \
     SMART_ENUM_IMPL_ENUM_MEMBERS(_, MEMBERS, MEMBER_DEFINITION)
 
-#define SMART_ENUM_IMPL_MEMBER_DEFINITION(_, NAME, MEMBER) \
+#define SMART_ENUM_IMPL_MEMBER_DEFINITION(PREFIX, NAME, MEMBER, INDEX) \
     NAME \
     SMART_ENUM_IMPL_MEMBER_DEFINITION_1 \
     ( \
@@ -159,8 +160,18 @@
         return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_FROM_STRING) throw std::invalid_argument("s"); \
     }
 
-#define SMART_ENUM_IMPL_MEMBER_FROM_STRING(PREFIX, NAME, _) \
+#define SMART_ENUM_IMPL_MEMBER_FROM_STRING(PREFIX, NAME, MEMBER, INDEX) \
     !strcmp(s, BOOST_PP_STRINGIZE(NAME)) ? PREFIX :: NAME :
+
+// index_of
+#define SMART_ENUM_IMPL_INDEX_OF(PREFIX, MEMBERS) \
+    static constexpr std::size_t index_of(PREFIX value) \
+    { \
+        return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_INDEX_OF) throw std::invalid_argument("value"); \
+    }
+
+#define SMART_ENUM_IMPL_MEMBER_INDEX_OF(PREFIX, NAME, MEMBER, INDEX) \
+    value == PREFIX :: NAME ? INDEX ## u :
 
 // to_string
 #define SMART_ENUM_IMPL_TO_STRING(PREFIX, MEMBERS) \
@@ -169,7 +180,7 @@
         return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_TO_STRING) throw std::invalid_argument("s"); \
     }
 
-#define SMART_ENUM_IMPL_MEMBER_TO_STRING(PREFIX, NAME, _) \
+#define SMART_ENUM_IMPL_MEMBER_TO_STRING(PREFIX, NAME, MEMBER, INDEX) \
     value == PREFIX :: NAME ? BOOST_PP_STRINGIZE(NAME) :
 
 // namespaces
@@ -211,11 +222,12 @@
     ( \
         BOOST_PP_TUPLE_ELEM(0, PREFIX_MEMBERS_MACRO), \
         BOOST_PP_TUPLE_ELEM(INDEX, BOOST_PP_TUPLE_ELEM(1, PREFIX_MEMBERS_MACRO)), \
-        BOOST_PP_TUPLE_ELEM(2, PREFIX_MEMBERS_MACRO) \
+        BOOST_PP_TUPLE_ELEM(2, PREFIX_MEMBERS_MACRO), \
+        INDEX \
     )
 
-#define SMART_ENUM_IMPL_PROCESS_MEMBERS_2(PREFIX, MEMBER, MACRO) \
-    BOOST_PP_CAT(SMART_ENUM_IMPL_, MACRO)(PREFIX, BOOST_PP_TUPLE_ELEM(0, MEMBER), MEMBER)
+#define SMART_ENUM_IMPL_PROCESS_MEMBERS_2(PREFIX, MEMBER, MACRO, INDEX) \
+    BOOST_PP_CAT(SMART_ENUM_IMPL_, MACRO)(PREFIX, BOOST_PP_TUPLE_ELEM(0, MEMBER), MEMBER, INDEX)
 
 namespace smart_enum
 {
@@ -259,6 +271,15 @@ namespace smart_enum
     constexpr const char *full_name()
     {
         return enum_traits<Enum>::full_name;
+    }
+
+    template
+    <
+        typename Enum
+    >
+    constexpr std::size_t index_of(Enum value)
+    {
+        return enum_traits<Enum>::index_of(value);
     }
 
     template

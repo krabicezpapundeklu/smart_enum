@@ -25,6 +25,7 @@ void test_additional_data();
 void test_count();
 void test_from_string();
 void test_full_name();
+void test_index_of();
 void test_name();
 void test_to_string();
 
@@ -59,6 +60,14 @@ void test_full_name()
     STATIC_ASSERT(equal(full_name<n_1::n_2::e_3>(), "n_1::n_2::e_3"));
 }
 
+void test_index_of()
+{
+    STATIC_ASSERT(index_of(e_1::e_1_a) == 0);
+    STATIC_ASSERT(index_of(e_1::e_1_b) == 1);
+    STATIC_ASSERT(index_of(e_1::e_1_c) == 2);
+    STATIC_ASSERT(index_of(e_1::e_1_d) == 3);
+}
+
 void test_name()
 {
     STATIC_ASSERT(equal(name<e_1>(), "e_1"));
@@ -78,6 +87,7 @@ int main()
     test_count();
     test_from_string();
     test_full_name();
+    test_index_of();
     test_name();
     test_to_string();
 
