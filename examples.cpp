@@ -14,7 +14,7 @@ using namespace smart_enum;
 
 SMART_ENUM(e_1, (e_1_a, (e_1_b, 10), (e_1_c, (1, 2, "x")), (e_1_d, 20, (4, 5, "y"))))
 SMART_ENUM(n_1, (e_2, short), (e_2_a, (e_2_b, 10), (e_2_c, (1, 2, "x")), (e_2_d, 20, (4, 5, "y"))))
-SMART_ENUM((n_1, n_2), e_3, (e_3_a, (e_3_b, 10), (e_3_c, (1, 2, "x")), (e_3_d, 20, (4, 5, "y"))))
+SMART_ENUM_CLASS((n_1, n_2), e_3, (e_3_a, (e_3_b, 10), (e_3_c, (1, 2, "x")), (e_3_d, 20, (4, 5, "y"))))
 
 #define STATIC_ASSERT(EXPR) \
     static_assert(EXPR, "! " # EXPR)
@@ -33,6 +33,7 @@ void test_range();
 void test_size();
 void test_to_string();
 void test_value_of();
+void test_values();
 
 constexpr bool equal(const char *x, const char *y)
 {
@@ -126,6 +127,14 @@ void test_value_of()
     STATIC_ASSERT(value_of<e_1>(3) == e_1::e_1_d);
 }
 
+void test_values()
+{
+    STATIC_ASSERT(e_1::e_1_a ==  0);
+    STATIC_ASSERT(e_1::e_1_b == 10);
+    STATIC_ASSERT(e_1::e_1_c == 11);
+    STATIC_ASSERT(e_1::e_1_d == 20);
+}
+
 int main()
 {
     test_count();
@@ -138,6 +147,7 @@ int main()
     test_size();
     test_to_string();
     test_value_of();
+    test_values();
 
     return 0;
 }
