@@ -30,6 +30,7 @@ void test_index_of();
 void test_iterators();
 void test_name();
 void test_range();
+void test_size();
 void test_to_string();
 void test_value_of();
 
@@ -105,6 +106,11 @@ void test_range()
     }
 }
 
+void test_size()
+{
+    STATIC_ASSERT(sizeof(n_1::e_2) == sizeof(short));
+}
+
 void test_to_string()
 {
     STATIC_ASSERT(equal(to_string(e_1::e_1_a), "e_1_a"));
@@ -129,6 +135,7 @@ int main()
     test_iterators();
     test_name();
     test_range();
+    test_size();
     test_to_string();
     test_value_of();
 
