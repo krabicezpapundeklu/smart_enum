@@ -90,6 +90,7 @@
             SMART_ENUM_IMPL_FROM_STRING(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_INDEX_OF(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_TO_STRING(FULL_NAME, MEMBERS) \
+            SMART_ENUM_IMPL_VALUE_OF(FULL_NAME, MEMBERS) \
         }; \
     }
 
@@ -182,6 +183,16 @@
 
 #define SMART_ENUM_IMPL_MEMBER_TO_STRING(PREFIX, NAME, MEMBER, INDEX) \
     value == PREFIX :: NAME ? BOOST_PP_STRINGIZE(NAME) :
+
+// value_of
+#define SMART_ENUM_IMPL_VALUE_OF(PREFIX, MEMBERS) \
+    static constexpr PREFIX value_of(std::size_t index) \
+    { \
+        return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_VALUE_OF) throw std::invalid_argument("index"); \
+    }
+
+#define SMART_ENUM_IMPL_MEMBER_VALUE_OF(PREFIX, NAME, MEMBER, INDEX) \
+    index == INDEX ? PREFIX :: NAME :
 
 // namespaces
 #define SMART_ENUM_IMPL_NAMESPACE_END(_) \
@@ -298,6 +309,15 @@ namespace smart_enum
     constexpr const char *to_string(Enum value)
     {
         return enum_traits<Enum>::to_string(value);
+    }
+
+    template
+    <
+        typename Enum
+    >
+    constexpr Enum value_of(std::size_t index)
+    {
+        return enum_traits<Enum>::value_of(index);
     }
 }
 

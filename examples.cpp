@@ -28,6 +28,7 @@ void test_full_name();
 void test_index_of();
 void test_name();
 void test_to_string();
+void test_value_of();
 
 constexpr bool equal(const char *x, const char *y)
 {
@@ -82,6 +83,14 @@ void test_to_string()
     STATIC_ASSERT(equal(to_string(n_1::n_2::e_3::e_3_a), "e_3_a"));
 }
 
+void test_value_of()
+{
+    STATIC_ASSERT(value_of<e_1>(0) == e_1::e_1_a);
+    STATIC_ASSERT(value_of<e_1>(1) == e_1::e_1_b);
+    STATIC_ASSERT(value_of<e_1>(2) == e_1::e_1_c);
+    STATIC_ASSERT(value_of<e_1>(3) == e_1::e_1_d);
+}
+
 int main()
 {
     test_count();
@@ -90,6 +99,7 @@ int main()
     test_index_of();
     test_name();
     test_to_string();
+    test_value_of();
 
     return 0;
 }
