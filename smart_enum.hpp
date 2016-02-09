@@ -113,9 +113,9 @@
 #define SMART_ENUM_IMPL_APPLY(PREFIX, MEMBERS) \
     template \
     < \
-        typename Action \
+        typename Action, typename... Args \
     > \
-    static auto apply(PREFIX value, Action action) -> decltype(action()) \
+    static auto apply(PREFIX value, Action action, Args&&... args) -> decltype(action(args...)) \
     { \
         switch(value) \
         { \
@@ -137,7 +137,8 @@
 #define SMART_ENUM_IMPL_MEMBER_APPLY_1(DATA) \
     BOOST_PP_IIF \
     ( \
-        BOOST_PP_IS_BEGIN_PARENS(DATA), DATA, () \
+        BOOST_PP_IS_BEGIN_PARENS(DATA), \
+            (args..., BOOST_PP_REMOVE_PARENS(DATA)), (args...) \
     )
 
 // member definitions
@@ -299,11 +300,11 @@ namespace smart_enum
 
     template
     <
-        typename Enum, typename Action
+        typename Enum, typename Action, typename... Args
     >
-    auto apply(Enum value, Action action) -> decltype(action())
+    auto apply(Enum value, Action action, Args&&... args) -> decltype(action(args...))
     {
-        return enum_traits<Enum>::apply(value, action);
+        return enum_traits<Enum>::apply(value, action, args...);
     }
 
     template

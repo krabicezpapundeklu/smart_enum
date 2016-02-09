@@ -36,34 +36,22 @@ void test_to_string();
 void test_value_of();
 void test_values();
 
-#ifdef _MSC_VER
-    #pragma warning(push)
-    #pragma warning(disable: 4626 5027)
-#endif
-
 class data_printer
 {
 public:
-    explicit data_printer(std::ostream &stream)
-        : stream_(stream)
-    {
-    }
-
     template
     <
         typename... Values
     >
-    void operator()(Values... values) const
+    void operator()(std::ostream &stream, Values... values) const
     {
-        stream_ << '{';
-        print(false, values...);
-        stream_ << '}';
+        stream << '{';
+        print(stream, false, values...);
+        stream << '}';
     }
 
 private:
-    std::ostream &stream_;
-
-    void print(bool) const
+    void print(std::ostream &, bool) const
     {
     }
 
@@ -71,21 +59,17 @@ private:
     <
         typename Value, typename... Values
     >
-    void print(bool comma, Value value, Values... values) const
+    void print(std::ostream &stream, bool comma, Value value, Values... values) const
     {
         if(comma)
         {
-            stream_ << ", ";
+            stream << ", ";
         }
 
-        stream_ << value;
-        print(true, values...);
+        stream << value;
+        print(stream, true, values...);
     }
 };
-
-#ifdef _MSC_VER
-    #pragma warning(pop)
-#endif
 
 constexpr bool equal(const char *x, const char *y)
 {
@@ -109,7 +93,7 @@ void test_data()
     for(auto e : range<e_1>())
     {
         std::cout << to_string(e) << ": ";
-        apply(e, data_printer(std::cout));
+        apply(e, data_printer(), std::cout);
         std::cout << std::endl;
     }
 }
