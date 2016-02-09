@@ -23,6 +23,7 @@ constexpr bool equal(const char *x, const char *y);
 constexpr bool equal_helper(const char *x, const char *y);
 
 void test_count();
+void test_data();
 void test_enum_class();
 void test_from_string();
 void test_full_name();
@@ -34,6 +35,57 @@ void test_size();
 void test_to_string();
 void test_value_of();
 void test_values();
+
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable: 4626 5027)
+#endif
+
+class data_printer
+{
+public:
+    explicit data_printer(std::ostream &stream)
+        : stream_(stream)
+    {
+    }
+
+    template
+    <
+        typename... Values
+    >
+    void operator()(Values... values) const
+    {
+        stream_ << '{';
+        print(false, values...);
+        stream_ << '}';
+    }
+
+private:
+    std::ostream &stream_;
+
+    void print(bool) const
+    {
+    }
+
+    template
+    <
+        typename Value, typename... Values
+    >
+    void print(bool comma, Value value, Values... values) const
+    {
+        if(comma)
+        {
+            stream_ << ", ";
+        }
+
+        stream_ << value;
+        print(true, values...);
+    }
+};
+
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
 constexpr bool equal(const char *x, const char *y)
 {
@@ -50,6 +102,16 @@ void test_count()
     STATIC_ASSERT(count<e_1>() == 4);
     STATIC_ASSERT(count<n_1::e_2>() == 4);
     STATIC_ASSERT(count<n_1::n_2::e_3>() == 4);
+}
+
+void test_data()
+{
+    for(auto e : range<e_1>())
+    {
+        std::cout << to_string(e) << ": ";
+        apply(e, data_printer(std::cout));
+        std::cout << std::endl;
+    }
 }
 
 void test_enum_class()
@@ -146,6 +208,7 @@ void test_values()
 int main()
 {
     test_count();
+    test_data();
     test_enum_class();
     test_from_string();
     test_full_name();

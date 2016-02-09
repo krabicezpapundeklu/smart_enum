@@ -87,12 +87,12 @@
             \
             static constexpr std::size_t count = BOOST_PP_TUPLE_SIZE(MEMBERS); \
             \
-            SMART_ENUM_IMPL_ADDITIONAL_DATA(FULL_NAME, MEMBERS) \
+            SMART_ENUM_IMPL_APPLY(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_FROM_STRING(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_INDEX_OF(FULL_NAME, MEMBERS) \
+            SMART_ENUM_IMPL_ITERATORS(FULL_NAME) \
             SMART_ENUM_IMPL_TO_STRING(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_VALUE_OF(FULL_NAME, MEMBERS) \
-            SMART_ENUM_IMPL_ITERATORS(FULL_NAME) \
         }; \
     }
 
@@ -109,8 +109,8 @@
 #define SMART_ENUM_IMPL_FULL_NAME_STRING_1(NAMESPACE) \
     BOOST_PP_STRINGIZE(NAMESPACE) "::"
 
-// additional data
-#define SMART_ENUM_IMPL_ADDITIONAL_DATA(PREFIX, MEMBERS) \
+// data
+#define SMART_ENUM_IMPL_APPLY(PREFIX, MEMBERS) \
     template \
     < \
         typename Action \
@@ -119,24 +119,25 @@
     { \
         switch(value) \
         { \
-            SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_ADDITIONAL_DATA) \
+            SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_APPLY) \
         } \
         \
         throw std::invalid_argument("value"); \
     }
 
-#define SMART_ENUM_IMPL_MEMBER_ADDITIONAL_DATA(PREFIX, NAME, MEMBER, INDEX) \
-    case PREFIX :: NAME: return action \
-        SMART_ENUM_IMPL_MEMBER_ADDITIONAL_DATA_1 \
-        ( \
-            BOOST_PP_TUPLE_ELEM(BOOST_PP_DEC(BOOST_PP_TUPLE_SIZE(MEMBER)), MEMBER) \
-        ) \
-    ;
+#define SMART_ENUM_IMPL_MEMBER_APPLY(PREFIX, NAME, MEMBER, INDEX) \
+    case PREFIX :: NAME: \
+        return action \
+            SMART_ENUM_IMPL_MEMBER_APPLY_1 \
+            ( \
+                BOOST_PP_TUPLE_ELEM(BOOST_PP_DEC(BOOST_PP_TUPLE_SIZE(MEMBER)), MEMBER) \
+            ) \
+        ;
 
-#define SMART_ENUM_IMPL_MEMBER_ADDITIONAL_DATA_1(ADDITIONAL_DATA) \
+#define SMART_ENUM_IMPL_MEMBER_APPLY_1(DATA) \
     BOOST_PP_IIF \
     ( \
-        BOOST_PP_IS_BEGIN_PARENS(ADDITIONAL_DATA), ADDITIONAL_DATA, () \
+        BOOST_PP_IS_BEGIN_PARENS(DATA), DATA, () \
     )
 
 // member definitions
