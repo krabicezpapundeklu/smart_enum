@@ -1,107 +1,123 @@
 #smart_enum
-Tiny library for C++ `enum` introspection.
+Tiny library for C++ `enum` introspection... and more!
 
-(Sorry for this readme being old, I'm working on updating it. For now, please see [examples.cpp](https://github.com/krabicezpapundeklu/smart_enum/blob/master/examples.cpp). Thanks!)
+(Sorry for this readme being outdated, I'm working on updating it. For now, please see [examples](https://github.com/krabicezpapundeklu/smart_enum/tree/master/examples) and  [tests.cpp](https://github.com/krabicezpapundeklu/smart_enum/blob/master/tests.cpp). Thanks!)
 
 ##Motivating example
+Command-line processing:
+
 ```c++
-SMART_ENUM
+#include "smart_enum.hpp"
+
+#include <cstring>
+#include <iostream>
+
+void function_1();
+void function_2();
+void function_3();
+
+// define "enum class" (use "SMART_ENUM" to define "enum") ...
+SMART_ENUM_CLASS
 (
-  e_1,
-  (
-    e_1_a, (e_1_b, 10), e_1_c, (e_1_d, e_1_a + 1), (e_1_e, 30)
-  )
+    // ... in namespace "examples" ...
+    examples,
+    // ... with name "options" having "char" type ("... enum class options : char ...") ...
+    (options, char),
+    (
+        // ... with member "run_1" having data "run-1", "runs 'function_1'" and pointer to "function_1" ...
+        (run_1, ("run-1", "runs 'function_1'", &function_1)),
+        // ... with member "run_2" having data "run-2", "runs 'function_2'" and pointer to "function_2"  ...
+        (run_2, ("run-2", "runs 'function_2'", &function_2)),
+        // ... with member "run_1" having data "run-3", "runs 'function_3'" and pointer to "function_3"  ...
+        (run_3, ("run-3", "runs 'function_3'", &function_3))
+    )
 )
 
-```
-
-Defines:
-
-```c++
-enum e_1
+void function_1()
 {
-  e_1_a,
-  e_1_b = 10,
-  e_1_c,
-  e_1_d = e_1_a + 1,
-  e_1_e = 30
-};
+    std::cout << "In 'function_1'" << std::endl;
+}
+
+void function_2()
+{
+    std::cout << "In 'function_2'" << std::endl;
+}
+
+void function_3()
+{
+    std::cout << "In 'function_3'" << std::endl;
+}
+
+int main(int argc, char **args)
+{
+    using namespace examples;
+    using namespace smart_enum;
+
+    if(argc == 1)
+    {
+        std::cout << "Available options:" << std::endl << std::endl;
+
+        // for each option ...
+        for(auto option : range<options>())
+        {
+            std::cout
+                // ... print argument name ...
+                << std::get<0>(data(option)) << " ==> "
+                // ... and option description
+                << std::get<1>(data(option))
+                << std::endl;
+        }
+
+        return 0;
+    }
+
+    for(auto i = 1; i < argc; ++i)
+    {
+        auto arg = args[i];
+
+        // for each option ...
+        for(auto option : range<options>())
+        {
+            // ... get its data ...
+            auto option_data = data(option);
+
+            // ... check if argument matches option's argument name ...
+            if(!std::strcmp(arg, std::get<0>(option_data)))
+            {
+                // ... call this option's function
+                std::get<2>(option_data)();
+            }
+        }
+    }
+
+    return 0;
+}
 ```
 
-And makes following functions available:
+Running this code without arguments shows:
 
-```c++
-begin<e_1>(), end<e_1>() // random-access iterators for value enumeration
-
-count<e_1>() = 5 // number of values in enum
-
-from_string<e_1>("e_1_a") = e_1::e_1_a // converts value name to value
-...
-from_string<e_1>("e_1_e") = e_1::e_1_e
-
-index_of(e_1::e_1_a) = 0 // index of value in enum
-...
-index_of(e_1::e_1_e) = 4
-
-is_enum_class<e_1>() = false // whether enum is 'enum' or 'enum class'
-
-name<e_1>() = "e_1" // name of enum
-
-range<e_1>() // range of enum values - for(auto x : range<e_1>()) {...}
-
-to_string(e_1::e_1_a) = "e_1_a" // converts value to string
-...
-to_string(e_1::e_1_e) = "e_1_e"
-
-value_of<e_1>(0) = e_1::e_1_a // value at specified index
-...
-value_of<e_1>(4) = e_1::e_1_e
 ```
-(See [examples.cpp](https://github.com/krabicezpapundeklu/smart_enum/blob/master/examples.cpp).)
+Available options:
 
-##Documentation
-###Macros `SMART_ENUM` and `SMART_ENUM_CLASS`
-Macros for defining "smart" enums. The only difference is that `SMART_ENUM` generates `enum` while `SMART_ENUM_CLASS` generates `enum class`.
+run-1 ==> runs 'function_1'
+run-2 ==> runs 'function_2'
+run-3 ==> runs 'function_3'
+```
 
-####Usage
-`SMART_ENUM(name_with_optional_size, (value_name_with_optional_value, value_name_with_optional_value, ...))`
-- `name_with_optional_size` - either enum name or tuple `(name, size)`. Example: `SMART_ENUM(e, ...)` defines `enum e {...};`, `SMART_ENUM((e, short), ...)` defines `enum e : short {...}`.
-- `value_name_with_optional_value` - either value name or tuple `(value_name, value)`. Example: `SMART_ENUM(e, (a, b))` defines `enum e {a, b};`, `SMART_ENUM(e, (a, (b, 10), c))` defines `enum e {a, b = 10, c};`.
+Running it as `./command_line run-1 run-2 run-3` shows:
 
-###Template `smart_enum::enum_traits<T>`
-- `begin()` - random-access iterator pointing to 1st enum value
-- `count` - number of values in enum
-- `end()` - random-access iterator pointing to last + 1 enum value
-- `from_string(s)` - converts value name to its value, throws `std::invalid_argument` exception if no such value exists
-- `index_of(value)` - returns index of value in enum
-- `is_enum_class` - whether enum is `enum` or `enum class`
-- `name` - name of enum
-- `range()` - range of enum values (`for(auto a : range<T>() {...}`)
-- `to_string(value)` - converts value to its name
-- `value_of(index)` - returns value based on its index, throws `std::invalid_argument` exception if `index >= count`.
-
-###Functions
-- `smart_enum::begin<T>()` - same as `smart_enum::enum_traits<T>::begin()`
-- `smart_enum::count<T>()` - same as `smart_enum::enum_traits<T>::count`
-- `smart_enum::end<T>()` - same as `smart_enum::enum_traits<T>::end()`
-- `smart_enum::from_string(s)` - same as `smart_enum::enum_traits<T>::from_string(s)`
-- `smart_enum::index_of(value)` - same as `smart_enum::enum_traits<T>::index_of(value)`
-- `smart_enum::is_enum_class<T>()` - same as `smart_enum::enum_traits<T>::is_enum_class`
-- `smart_enum::name<T>()` - same as `smart_enum::enum_traits<T>::name`
-- `smart_enum::range<T>()` - same as `smart_enum::enum_traits<T>::range()`
-- `smart_enum::to_string(value)` - same as `smart_enum::enum_traits<T>::to_string(value)`
-- `smart_enum::value_of<T>(index)` - same as `smart_enum::enum_traits<T>::value_of(index)`
-
-###Other
-- `smart_enum::enum_iterator<T>` - random-access enum value iterator
-- `smart_enum::enum_range<T>` - enum values range
+```
+In 'function_1'
+In 'function_2'
+In 'function_3'
+```
 
 ##Library usage
-If you are using [Boost](http://www.boost.org/) >= 1.60 then just add `smart_enum.hpp` to your project and you're done.
-If not then also add included `boost` directory which contains subset of [Boost](http://www.boost.org/).
+If you are using [Boost](http://www.boost.org/) then just add [smart_enum.hpp](https://github.com/krabicezpapundeklu/smart_enum/blob/master/smart_enum.hpp) to your project and you're done.
+If not then also add included [boost](https://github.com/krabicezpapundeklu/smart_enum/tree/master/boost) directory which contains subset of [Boost](http://www.boost.org/).
 
 ##Supported compilers
-Tested with Clang (3.5.2, 3.7.0), g++ (4.7.3, 5.3.0) and MSVC 2015, but should work with any compiler with support for C++ 11 and variadic macros.
+Tested with Clang (3.5.2, 3.7.0), g++ (4.7.3, 5.3.0) and MSVC 2015, but any compiler with C++ 11 support should be fine.
 
 ##License
 Uses standard [Boost license](http://www.boost.org/LICENSE_1_0.txt).
