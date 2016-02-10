@@ -9,6 +9,7 @@
 #define SMART_ENUM_HEADER_INCLUDED
 
 #include <stdexcept>
+#include <tuple>
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/preprocessor.hpp>
@@ -81,13 +82,14 @@
         template<> struct enum_traits<FULL_NAME> : detail::enum_traits_base<FULL_NAME> \
         { \
             using type = FULL_NAME; \
+            using data_type = SMART_ENUM_IMPL_DATA_TYPE(BOOST_PP_TUPLE_ELEM(0, MEMBERS)); \
             \
             static constexpr const char *name = BOOST_PP_STRINGIZE(NAME); \
             static constexpr const char *full_name = FULL_NAME_STRING; \
             \
             static constexpr std::size_t count = BOOST_PP_TUPLE_SIZE(MEMBERS); \
             \
-            SMART_ENUM_IMPL_APPLY(FULL_NAME, MEMBERS) \
+            SMART_ENUM_IMPL_DATA(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_FROM_STRING(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_INDEX_OF(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_TO_STRING(FULL_NAME, MEMBERS) \
@@ -109,35 +111,46 @@
     BOOST_PP_STRINGIZE(NAMESPACE) "::"
 
 // data
-#define SMART_ENUM_IMPL_APPLY(PREFIX, MEMBERS) \
-    template \
-    < \
-        typename Result, typename Action, typename... Args \
-    > \
-    static Result apply(PREFIX value, Action action, Args&&... args) \
+#define SMART_ENUM_IMPL_DATA(PREFIX, MEMBERS) \
+    static data_type data(PREFIX value) \
     { \
         switch(value) \
         { \
-            SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_APPLY) \
+            SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_DATA) \
         } \
         \
         throw std::invalid_argument("value"); \
     }
 
-#define SMART_ENUM_IMPL_MEMBER_APPLY(PREFIX, NAME, MEMBER, INDEX) \
+#define SMART_ENUM_IMPL_MEMBER_DATA(PREFIX, NAME, MEMBER, INDEX) \
     case PREFIX :: NAME: \
-        return action \
-            SMART_ENUM_IMPL_MEMBER_APPLY_1 \
+        return std::make_tuple \
+            SMART_ENUM_IMPL_MEMBER_DATA_1 \
             ( \
-                BOOST_PP_TUPLE_ELEM(BOOST_PP_DEC(BOOST_PP_TUPLE_SIZE(MEMBER)), MEMBER) \
+                SMART_ENUM_IMPL_TUPLE_LAST_ELEMENT(MEMBER) \
             ) \
         ;
 
-#define SMART_ENUM_IMPL_MEMBER_APPLY_1(DATA) \
+#define SMART_ENUM_IMPL_MEMBER_DATA_1(DATA) \
     BOOST_PP_IIF \
     ( \
-        BOOST_PP_IS_BEGIN_PARENS(DATA), \
-            (args..., BOOST_PP_REMOVE_PARENS(DATA)), (args...) \
+        BOOST_PP_IS_BEGIN_PARENS(DATA), DATA, () \
+    )
+
+#define SMART_ENUM_IMPL_DATA_TYPE(MEMBER) \
+    decltype \
+    ( \
+        std::make_tuple \
+            SMART_ENUM_IMPL_DATA_TYPE_1 \
+            ( \
+                SMART_ENUM_IMPL_TUPLE_LAST_ELEMENT(MEMBER) \
+            ) \
+    )
+
+#define SMART_ENUM_IMPL_DATA_TYPE_1(DATA) \
+    BOOST_PP_IIF \
+    ( \
+        BOOST_PP_IS_BEGIN_PARENS(DATA), DATA, () \
     )
 
 // member definitions
@@ -243,6 +256,9 @@
 #define SMART_ENUM_IMPL_PROCESS_MEMBERS_2(PREFIX, MEMBER, MACRO, INDEX) \
     BOOST_PP_CAT(SMART_ENUM_IMPL_, MACRO)(PREFIX, BOOST_PP_TUPLE_ELEM(0, MEMBER), MEMBER, INDEX)
 
+#define SMART_ENUM_IMPL_TUPLE_LAST_ELEMENT(TUPLE) \
+    BOOST_PP_TUPLE_ELEM(BOOST_PP_DEC(BOOST_PP_TUPLE_SIZE(TUPLE)), TUPLE)
+
 namespace smart_enum
 {
     template
@@ -282,20 +298,20 @@ namespace smart_enum
 
     template
     <
-        typename Result, typename Enum, typename Action, typename... Args
+        typename Enum
     >
-    Result apply(Enum value, Action action, Args&&... args)
+    constexpr enum_iterator<Enum> begin()
     {
-        return enum_traits<Enum>::template apply<Result>(value, action, args...);
+        return enum_iterator<Enum>{enum_traits<Enum>::value_of(0)};
     }
 
     template
     <
         typename Enum
     >
-    constexpr enum_iterator<Enum> begin()
+    typename enum_traits<Enum>::data_type data(Enum value)
     {
-        return enum_iterator<Enum>{enum_traits<Enum>::value_of(0)};
+        return enum_traits<Enum>::data(value);
     }
 
     template

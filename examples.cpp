@@ -12,9 +12,9 @@
 
 using namespace smart_enum;
 
-SMART_ENUM(e_1, (e_1_a, (e_1_b, 10), (e_1_c, (1, 2, "x")), (e_1_d, 20, (4, 5, "y"))))
-SMART_ENUM(n_1, (e_2, short), (e_2_a, (e_2_b, 10), (e_2_c, (1, 2, "x")), (e_2_d, 20, (4, 5, "y"))))
-SMART_ENUM_CLASS((n_1, n_2), e_3, (e_3_a, (e_3_b, 10), (e_3_c, (1, 2, "x")), (e_3_d, 20, (4, 5, "y"))))
+SMART_ENUM(e_1, ((e_1_a, (1, "a")), (e_1_b, 10, (2, "b")), (e_1_c, (3, "c")), (e_1_d, 20, (4, "d"))))
+SMART_ENUM(n_1, (e_2, short), (e_2_a, (e_2_b, 10), e_2_c, (e_2_d, 20)))
+SMART_ENUM_CLASS((n_1, n_2), e_3, (e_3_a, (e_3_b, 10), e_3_c, (e_3_d, 20)))
 
 #define STATIC_ASSERT(EXPR) \
     static_assert(EXPR, "! " # EXPR)
@@ -36,41 +36,6 @@ void test_to_string();
 void test_value_of();
 void test_values();
 
-class data_printer
-{
-public:
-    template
-    <
-        typename... Values
-    >
-    void operator()(std::ostream &stream, Values... values) const
-    {
-        stream << '{';
-        print(stream, false, values...);
-        stream << '}';
-    }
-
-private:
-    void print(std::ostream &, bool) const
-    {
-    }
-
-    template
-    <
-        typename Value, typename... Values
-    >
-    void print(std::ostream &stream, bool comma, Value value, Values... values) const
-    {
-        if(comma)
-        {
-            stream << ", ";
-        }
-
-        stream << value;
-        print(stream, true, values...);
-    }
-};
-
 constexpr bool equal(const char *x, const char *y)
 {
     return (x == nullptr && y == nullptr) || (x && y && equal_helper(x, y));
@@ -90,12 +55,15 @@ void test_count()
 
 void test_data()
 {
-    for(auto e : range<e_1>())
-    {
-        std::cout << to_string(e) << ": ";
-        apply<void>(e, data_printer(), std::cout);
-        std::cout << std::endl;
-    }
+    assert(std::get<0>(data(e_1::e_1_a)) == 1);
+    assert(std::get<0>(data(e_1::e_1_b)) == 2);
+    assert(std::get<0>(data(e_1::e_1_c)) == 3);
+    assert(std::get<0>(data(e_1::e_1_d)) == 4);
+
+    assert(!std::strcmp(std::get<1>(data(e_1::e_1_a)), "a"));
+
+    STATIC_ASSERT(std::tuple_size<enum_traits<e_1>::data_type>::value == 2);
+    STATIC_ASSERT(std::tuple_size<enum_traits<n_1::e_2>::data_type>::value == 0);
 }
 
 void test_enum_class()
