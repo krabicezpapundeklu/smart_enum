@@ -93,7 +93,7 @@ void test_data()
     for(auto e : range<e_1>())
     {
         std::cout << to_string(e) << ": ";
-        apply(e, data_printer(), std::cout);
+        apply<void>(e, data_printer(), std::cout);
         std::cout << std::endl;
     }
 }

@@ -90,7 +90,6 @@
             SMART_ENUM_IMPL_APPLY(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_FROM_STRING(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_INDEX_OF(FULL_NAME, MEMBERS) \
-            SMART_ENUM_IMPL_ITERATORS(FULL_NAME) \
             SMART_ENUM_IMPL_TO_STRING(FULL_NAME, MEMBERS) \
             SMART_ENUM_IMPL_VALUE_OF(FULL_NAME, MEMBERS) \
         }; \
@@ -113,9 +112,9 @@
 #define SMART_ENUM_IMPL_APPLY(PREFIX, MEMBERS) \
     template \
     < \
-        typename Action, typename... Args \
+        typename Result, typename Action, typename... Args \
     > \
-    static auto apply(PREFIX value, Action action, Args&&... args) -> decltype(action(args...)) \
+    static Result apply(PREFIX value, Action action, Args&&... args) \
     { \
         switch(value) \
         { \
@@ -197,23 +196,6 @@
 
 #define SMART_ENUM_IMPL_MEMBER_VALUE_OF(PREFIX, NAME, MEMBER, INDEX) \
     index == INDEX ? PREFIX :: NAME :
-
-// iterators
-#define SMART_ENUM_IMPL_ITERATORS(FULL_NAME) \
-    static constexpr enum_iterator<FULL_NAME> begin() \
-    { \
-        return enum_iterator<FULL_NAME>{value_of(0)}; \
-    } \
-    \
-    static constexpr enum_iterator<FULL_NAME> end() \
-    { \
-        return {}; \
-    } \
-    \
-    static constexpr enum_range<FULL_NAME> range() \
-    { \
-        return {}; \
-    }
 
 // namespaces
 #define SMART_ENUM_IMPL_NAMESPACE_END(_) \
@@ -300,11 +282,11 @@ namespace smart_enum
 
     template
     <
-        typename Enum, typename Action, typename... Args
+        typename Result, typename Enum, typename Action, typename... Args
     >
-    auto apply(Enum value, Action action, Args&&... args) -> decltype(action(args...))
+    Result apply(Enum value, Action action, Args&&... args)
     {
-        return enum_traits<Enum>::apply(value, action, args...);
+        return enum_traits<Enum>::template apply<Result>(value, action, args...);
     }
 
     template
@@ -313,7 +295,7 @@ namespace smart_enum
     >
     constexpr enum_iterator<Enum> begin()
     {
-        return enum_traits<Enum>::begin();
+        return enum_iterator<Enum>{enum_traits<Enum>::value_of(0)};
     }
 
     template
@@ -322,7 +304,7 @@ namespace smart_enum
     >
     constexpr enum_iterator<Enum> end()
     {
-        return enum_traits<Enum>::end();
+        return {};
     }
 
     template
@@ -385,7 +367,7 @@ namespace smart_enum
     >
     constexpr enum_range<Enum> range()
     {
-        return enum_traits<Enum>::range();
+        return {};
     }
 
     template
