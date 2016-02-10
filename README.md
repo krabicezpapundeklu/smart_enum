@@ -101,7 +101,7 @@ If you are using [Boost](http://www.boost.org/) >= 1.60 then just add `smart_enu
 If not then also add included `boost` directory which contains subset of [Boost](http://www.boost.org/).
 
 ##Supported compilers
-Tested with Clang 3.7.0, g++ 5.3.0 and MSVC 2015, but should work with any compiler with support for C++ 11 and variadic macros.
+Tested with Clang (3.5.2, 3.7.0), g++ (4.7.3, 5.3.0) and MSVC 2015, but should work with any compiler with support for C++ 11 and variadic macros.
 
 ##License
 Uses standard [Boost license](http://www.boost.org/LICENSE_1_0.txt).
