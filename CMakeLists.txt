@@ -21,4 +21,8 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_definitions("/Wall /WX /wd4365 /wd4514 /wd4668 /wd4710 /wd4715")
 endif()
 
-add_executable(smart_enum examples.cpp smart_enum.hpp)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+add_executable(tests tests.cpp smart_enum.hpp)
+
+add_subdirectory(examples)
