@@ -1,6 +1,8 @@
 #smart_enum
 Tiny library for C++ `enum` introspection.
 
+(Sorry for this readme being old, I'm working on updating it. For now, please see [examples.cpp](https://github.com/krabicezpapundeklu/smart_enum/blob/master/examples.cpp). Thanks!)
+
 ##Motivating example
 ```c++
 SMART_ENUM
@@ -55,7 +57,7 @@ value_of<e_1>(0) = e_1::e_1_a // value at specified index
 ...
 value_of<e_1>(4) = e_1::e_1_e
 ```
-(See `examples.cpp`.)
+(See [examples.cpp](https://github.com/krabicezpapundeklu/smart_enum/blob/master/examples.cpp).)
 
 ##Documentation
 ###Macros `SMART_ENUM` and `SMART_ENUM_CLASS`
