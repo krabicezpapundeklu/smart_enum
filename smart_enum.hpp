@@ -12,7 +12,12 @@
 #include <tuple>
 
 #include <boost/iterator/iterator_facade.hpp>
-#include <boost/preprocessor.hpp>
+
+#include <boost/preprocessor/arithmetic/dec.hpp>
+#include <boost/preprocessor/logical/not.hpp>
+#include <boost/preprocessor/punctuation/remove_parens.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/tuple/push_back.hpp>
 
 #define SMART_ENUM(...) \
     SMART_ENUM_IMPL(, __VA_ARGS__)
