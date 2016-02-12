@@ -8,6 +8,7 @@
 #ifndef SMART_ENUM_HEADER_INCLUDED
 #define SMART_ENUM_HEADER_INCLUDED
 
+#include <cstring>
 #include <stdexcept>
 #include <tuple>
 
