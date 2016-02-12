@@ -197,13 +197,19 @@
 
 // to_string
 #define SMART_ENUM_IMPL_TO_STRING(PREFIX, MEMBERS) \
-    static constexpr const char *to_string(PREFIX value) \
+    static const char *to_string(PREFIX value) \
     { \
-        return SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_TO_STRING) throw std::invalid_argument("s"); \
+        switch(value) \
+        { \
+            SMART_ENUM_IMPL_REPEAT_MEMBERS(PREFIX, MEMBERS, MEMBER_TO_STRING) \
+        } \
+        \
+        throw std::invalid_argument("value"); \
     }
 
 #define SMART_ENUM_IMPL_MEMBER_TO_STRING(PREFIX, NAME, MEMBER, INDEX) \
-    value == PREFIX :: NAME ? BOOST_PP_STRINGIZE(NAME) :
+    case PREFIX :: NAME: \
+        return BOOST_PP_STRINGIZE(NAME);
 
 // value_of
 #define SMART_ENUM_IMPL_VALUE_OF(PREFIX, MEMBERS) \
@@ -395,7 +401,7 @@ namespace smart_enum
     <
         typename Enum
     >
-    constexpr const char *to_string(Enum value)
+    const char *to_string(Enum value)
     {
         return enum_traits<Enum>::to_string(value);
     }

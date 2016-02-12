@@ -130,9 +130,9 @@ void test_size()
 
 void test_to_string()
 {
-    STATIC_ASSERT(equal(to_string(e_1::e_1_a), "e_1_a"));
-    STATIC_ASSERT(equal(to_string(n_1::e_2::e_2_a), "e_2_a"));
-    STATIC_ASSERT(equal(to_string(n_1::n_2::e_3::e_3_a), "e_3_a"));
+    assert(equal(to_string(e_1::e_1_a), "e_1_a"));
+    assert(equal(to_string(n_1::e_2::e_2_a), "e_2_a"));
+    assert(equal(to_string(n_1::n_2::e_3::e_3_a), "e_3_a"));
 }
 
 void test_value_of()
